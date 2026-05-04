@@ -5,6 +5,6 @@ Knives Out|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESY
 League Of Legends|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/LeagueOfLegend.txt
 Roblox Player|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Roblox.txt
 Roblox Studio|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/RobloxStudio.txt
-SFAlpha|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/SFAlpha.txt
+SF Alpha|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/SFAlpha.txt
 SFRush|https://github.com/newbornhacker2016-gif/GL-TECHGAMESYNC/blob/main/SFRush.txt
 Valorant|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Valorant.txt
