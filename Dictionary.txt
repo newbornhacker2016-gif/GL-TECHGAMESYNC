@@ -11,7 +11,6 @@
 "patcher_cf2", "Crossfire PH"
 "Blood Strike", "Blood Strike"
 "bloodstrike", "Blood Strike"
-"launcher", "Knives Out"
 "SF Alpha Launcher", "SF Alpha Launcher"
 "BullSF Launcher", "BullSF Launcher"
 "SF Alpha Launcher","SF Alpha"
