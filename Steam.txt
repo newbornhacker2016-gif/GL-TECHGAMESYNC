@@ -1,99 +1,99 @@
-7 Days to Die : 251570
-ARK Survival Evolved : 346110
-Age of Empires IV : 1466860
-Among Us : 945360
-Apex Legends : 1172470
-Assassins Creed Mirage : 2609540
-Assassins Creed Odyssey : 812140
-Assassins Creed Origins : 582160
-Assassins Creed Syndicate : 368500
-Assassins Creed Unity : 289650
-Assassins Creed Valhalla : 2208920
-Astroneer : 361420
-Baldurs Gate 3 : 1086940
-Batman Arkham Knight : 208650
-Battlefield 2042 : 1517290
-Black Myth Wukong : 2358720
-Call of Duty Warzone : 1962663
-Celeste : 504230
-Cities Skylines : 255710
-Counter-Strike 2 : 730
-Crusader Kings III : 1158310
-Cyberpunk 2077 : 1091500
-Dark Souls III : 374320
-Dave the Diver : 1868140
-DayZ : 221100
-Dead by Daylight : 381210
-Deep Rock Galactic : 548430
-Destiny 2 : 1085660
-Disco Elysium : 632470
-Divinity Original Sin 2 : 435150
-Dota 2 : 570
-Dragon's Dogma 2 : 2054970
-Dredge : 1562430
-Dying Light 2 Stay Human : 534380
-Dyson Sphere Program : 1366540
-Elden Ring : 1245620
-Euro Truck Simulator 2 : 227300
-Factorio : 427520
-Fall Guys : 1097150
-Football Manager 2024 : 2252570
-For Honor : 304390
-Forza Horizon 5 : 1551360
-Garry's Mod : 4000
-Grand Theft Auto V : 271590
-Green Hell : 815370
-Grounded : 962130
-Hades : 1145360
-Half-Life Alyx : 546560
-Helldivers 2 : 553850
-Hogwarts Legacy : 2246340
-Hollow Knight : 367520
-Hunt Showdown 1896 : 594650
-Inscryption : 1092790
-Kerbal Space Program 2 : 954850
-Killing Floor 2 : 232090
-Left 4 Dead 2 : 550
-Lost Ark : 1599340
-Microsoft Flight Simulator : 1250410
-Monster Hunter World : 582010
-New World Aeternum : 1063730
-No Man's Sky : 275850
-Oxygen Not Included : 457140
-PUBG Battlegrounds : 578080
-Palworld : 1623730
-Path of Exile : 238960
-Pathfinder Wrath of the Righteous : 1184370
-Phasmophobia : 739630
-Planet Zoo : 703080
-Portal 2 : 620
-Raft : 648800
-Rainbow Six Siege : 359550
-Red Dead Redemption 2 : 1174180
-Return of the Obra Dinn : 653530
-Rocket League : 252950
-Rust : 252490
-Satisfactory : 526870
-Sea of Thieves : 1172620
-Sekiro Shadows Die Twice : 814380
-Sid Meiers Civilization VI : 289070
-Slay the Spire : 646570
-Sons Of The Forest : 1326470
-Stardew Valley : 413150
-Stellaris : 281990
-Stranded Deep : 313120
-Subnautica : 264710
-Team Fortress 2 : 440
-Terraria : 105600
-The Forest : 242760
-The Long Dark : 305620
-The Witcher 3 Wild Hunt : 292030
-Total War Warhammer III : 1142710
-Two Point Hospital : 535930
-Valheim : 892970
-Vampire Survivors : 1794680
-Victoria 3 : 529340
-Warframe : 230410
-Warhammer 40000 Space Marine 2 : 2183900
-Wasteland 3 : 983870
-XCOM 2 : 268500
+Steam Counter-Strike 2 : 730
+Steam Dota 2 : 570
+Steam Apex Legends : 1172470
+Steam Warframe : 230410
+Steam Destiny 2 : 1085660
+Steam Team Fortress 2 : 440
+Steam Path of Exile : 238960
+Steam Lost Ark : 1599340
+Steam Genshin Impact : 1971870
+Steam Call of Duty Warzone : 1962663
+Steam Fall Guys : 1097150
+Steam Rocket League : 252950
+Steam Brawlhalla : 291550
+Steam Smite : 386360
+Steam Paladins : 444090
+Steam War Thunder : 236390
+Steam World of Warships : 552990
+Steam World of Tanks Blitz : 444200
+Steam Star Wars The Old Republic : 1286830
+Steam Neverwinter : 212500
+Steam Splitgate : 677620
+Steam Enlisted : 1048090
+Steam Crossfire : 560380
+Steam Unturned : 304930
+Steam Rogue Company : 872100
+Steam Dauntless : 1006860
+Steam Battlerite : 504370
+Steam Heroes and Generals : 329910
+Steam Planetside 2 : 218230
+Steam Hawken Reborn : 271290
+Steam Mechwarrior Online : 342200
+Steam Armored Warfare : 416310
+Steam Deceit : 466240
+Steam Super Animal Royale : 1089980
+Steam Eternal Return : 1049590
+Steam Naraka Bladepoint : 1172380
+Steam Magic The Gathering Arena : 2141910
+Steam Legends of Runeterra : 1256460
+Steam Shadowverse : 453480
+Steam Yu-Gi-Oh Master Duel : 1449850
+Steam Gwent The Witcher Card Game : 1284410
+Steam Eternal Card Game : 531640
+Steam Minion Masters : 489520
+Steam Path of Exile 2 : 2694490
+Steam Smite 2 : 2437340
+Steam Honkai Star Rail : 1260320
+Steam Wuthering Waves : 2433510
+Steam Tower of Fantasy : 2000300
+Steam MapleStory : 216150
+Steam Dungeon Fighter Online : 1622350
+Steam Elsword : 293600
+Steam Vindictus : 212160
+Steam Dragon Nest : 210050
+Steam Conquerors Blade : 897840
+Steam Last Oasis : 903950
+Steam Foxhole : 505460
+Steam Vampire The Masquerade Bloodhunt : 760230
+Steam Crossout : 386180
+Steam Dirty Bomb : 333930
+Steam Diabotical : 1230280
+Steam Cuisine Royale : 755790
+Steam Super People : 1443880
+Steam Spellbreak : 1049550
+Steam Forge of Empires : 1028920
+Steam Krunker : 1258150
+Steam Starsiege Deadzone : 2038090
+Steam Tribes of Midgard : 1259680
+Steam Bleeding Edge : 1065180
+Steam Ring of Elysium : 1305380
+Steam Fractured Online : 1378130
+Steam Dreadnought : 530700
+Steam Gigantic Rampage Edition : 2443720
+Steam Gunfire Reborn : 1217060
+Steam The Isle : 376210
+Steam Scum : 513710
+Steam Kritika Reboot : 585680
+Steam Faeria : 398530
+Steam Dragon Ball The Breakers : 1279470
+Steam Wayfinder : 1921690
+Steam Farlight 84 : 1928870
+Steam Stumble Guys : 1677280
+Steam Trove : 304050
+Steam Tera : 323160
+Steam Skyforge : 364830
+Steam Aura Kingdom : 316580
+Steam Closers : 502670
+Steam Soulworker : 630100
+Steam Phantasy Star Online 2 New Genesis : 1357670
+Steam Torchlight Infinite : 2005640
+Steam Swords of Legends Online : 1456870
+Steam MultiVersus : 1818750
+Steam Omega Strikers : 1869590
+Steam Predecessor : 1835930
+Steam Supervive : 2138720
+Steam Deadlock : 1422450
+Steam Niffelheim : 604390
+Steam Spellweaver : 345700
+Steam Eternal Fury Resurrected : 1996590
+Steam Knockout City : 1278350
