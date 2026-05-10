@@ -1,99 +1,99 @@
-Steam Counter-Strike 2 : 730
-Steam Dota 2 : 570
-Steam Apex Legends : 1172470
-Steam Warframe : 230410
-Steam Destiny 2 : 1085660
-Steam Team Fortress 2 : 440
-Steam Path of Exile : 238960
-Steam Lost Ark : 1599340
-Steam Genshin Impact : 1971870
-Steam Call of Duty Warzone : 1962663
-Steam Fall Guys : 1097150
-Steam Rocket League : 252950
-Steam Brawlhalla : 291550
-Steam Smite : 386360
-Steam Paladins : 444090
-Steam War Thunder : 236390
-Steam World of Warships : 552990
-Steam World of Tanks Blitz : 444200
-Steam Star Wars The Old Republic : 1286830
-Steam Neverwinter : 212500
-Steam Splitgate : 677620
-Steam Enlisted : 1048090
-Steam Crossfire : 560380
-Steam Unturned : 304930
-Steam Rogue Company : 872100
-Steam Dauntless : 1006860
-Steam Battlerite : 504370
-Steam Heroes and Generals : 329910
-Steam Planetside 2 : 218230
-Steam Hawken Reborn : 271290
-Steam Mechwarrior Online : 342200
-Steam Armored Warfare : 416310
-Steam Deceit : 466240
-Steam Super Animal Royale : 1089980
-Steam Eternal Return : 1049590
-Steam Naraka Bladepoint : 1172380
-Steam Magic The Gathering Arena : 2141910
-Steam Legends of Runeterra : 1256460
-Steam Shadowverse : 453480
-Steam Yu-Gi-Oh Master Duel : 1449850
-Steam Gwent The Witcher Card Game : 1284410
-Steam Eternal Card Game : 531640
-Steam Minion Masters : 489520
-Steam Path of Exile 2 : 2694490
-Steam Smite 2 : 2437340
-Steam Honkai Star Rail : 1260320
-Steam Wuthering Waves : 2433510
-Steam Tower of Fantasy : 2000300
-Steam MapleStory : 216150
-Steam Dungeon Fighter Online : 1622350
-Steam Elsword : 293600
-Steam Vindictus : 212160
-Steam Dragon Nest : 210050
-Steam Conquerors Blade : 897840
-Steam Last Oasis : 903950
-Steam Foxhole : 505460
-Steam Vampire The Masquerade Bloodhunt : 760230
-Steam Crossout : 386180
-Steam Dirty Bomb : 333930
-Steam Diabotical : 1230280
-Steam Cuisine Royale : 755790
-Steam Super People : 1443880
-Steam Spellbreak : 1049550
-Steam Forge of Empires : 1028920
-Steam Krunker : 1258150
-Steam Starsiege Deadzone : 2038090
-Steam Tribes of Midgard : 1259680
-Steam Bleeding Edge : 1065180
-Steam Ring of Elysium : 1305380
-Steam Fractured Online : 1378130
-Steam Dreadnought : 530700
-Steam Gigantic Rampage Edition : 2443720
-Steam Gunfire Reborn : 1217060
-Steam The Isle : 376210
-Steam Scum : 513710
-Steam Kritika Reboot : 585680
-Steam Faeria : 398530
-Steam Dragon Ball The Breakers : 1279470
-Steam Wayfinder : 1921690
-Steam Farlight 84 : 1928870
-Steam Stumble Guys : 1677280
-Steam Trove : 304050
-Steam Tera : 323160
-Steam Skyforge : 364830
-Steam Aura Kingdom : 316580
-Steam Closers : 502670
-Steam Soulworker : 630100
-Steam Phantasy Star Online 2 New Genesis : 1357670
-Steam Torchlight Infinite : 2005640
-Steam Swords of Legends Online : 1456870
-Steam MultiVersus : 1818750
-Steam Omega Strikers : 1869590
-Steam Predecessor : 1835930
-Steam Supervive : 2138720
-Steam Deadlock : 1422450
-Steam Niffelheim : 604390
-Steam Spellweaver : 345700
-Steam Eternal Fury Resurrected : 1996590
-Steam Knockout City : 1278350
+Steam Counter-Strike 2
+Steam Dota 2
+Steam Apex Legends
+Steam Warframe
+Steam Destiny 2
+Steam Team Fortress 2
+Steam Path of Exile
+Steam Lost Ark
+Steam Genshin Impact
+Steam Call of Duty Warzone
+Steam Fall Guys
+Steam Rocket League
+Steam Brawlhalla
+Steam Smite
+Steam Paladins
+Steam War Thunder
+Steam World of Warships
+Steam World of Tanks Blitz
+Steam Star Wars The Old Republic
+Steam Neverwinter
+Steam Splitgate
+Steam Enlisted
+Steam Crossfire
+Steam Unturned
+Steam Rogue Company
+Steam Dauntless
+Steam Battlerite
+Steam Heroes and Generals
+Steam Planetside 2
+Steam Hawken Reborn
+Steam Mechwarrior Online
+Steam Armored Warfare
+Steam Deceit
+Steam Super Animal Royale
+Steam Eternal Return
+Steam Naraka Bladepoint
+Steam Magic The Gathering Arena
+Steam Legends of Runeterra
+Steam Shadowverse
+Steam Yu-Gi-Oh Master Duel
+Steam Gwent The Witcher Card Game
+Steam Eternal Card Game
+Steam Minion Masters
+Steam Path of Exile 2
+Steam Smite 2
+Steam Honkai Star Rail
+Steam Wuthering Waves
+Steam Tower of Fantasy
+Steam MapleStory
+Steam Dungeon Fighter Online
+Steam Elsword
+Steam Vindictus
+Steam Dragon Nest
+Steam Conquerors Blade
+Steam Last Oasis
+Steam Foxhole
+Steam Vampire The Masquerade Bloodhunt
+Steam Crossout
+Steam Dirty Bomb
+Steam Diabotical
+Steam Cuisine Royale
+Steam Super People
+Steam Spellbreak
+Steam Forge of Empires
+Steam Krunker
+Steam Starsiege Deadzone
+Steam Tribes of Midgard
+Steam Bleeding Edge
+Steam Ring of Elysium
+Steam Fractured Online
+Steam Dreadnought
+Steam Gigantic Rampage Edition
+Steam Gunfire Reborn
+Steam The Isle
+Steam Scum
+Steam Kritika Reboot
+Steam Faeria
+Steam Dragon Ball The Breakers
+Steam Wayfinder
+Steam Farlight 84
+Steam Stumble Guys
+Steam Trove
+Steam Tera
+Steam Skyforge
+Steam Aura Kingdom
+Steam Closers
+Steam Soulworker
+Steam Phantasy Star Online 2 New Genesis
+Steam Torchlight Infinite
+Steam Swords of Legends Online
+Steam MultiVersus
+Steam Omega Strikers
+Steam Predecessor
+Steam Supervive
+Steam Deadlock
+Steam Niffelheim
+Steam Spellweaver
+Steam Eternal Fury Resurrected
+Steam Knockout City
