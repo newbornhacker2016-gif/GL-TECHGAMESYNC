@@ -12,13 +12,4 @@ Steam Call of Duty Warzone|https://raw.githubusercontent.com/newbornhacker2016-g
 Steam Counter-Strike 2|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Counter-Strike%202.txt
 Steam Dota 2|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Dota%202.txt
 Steam Farlight 84|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Farlight%2084.txt
-Steam Genshin Impact|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Genshin%20Impact.txt
-Steam Legends of Runeterra|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Legends%20of%20Runeterra.txt
-Steam Lost Ark|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Lost%20Ark.txt
-Steam Paladins|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Paladins.txt
-Steam Smite|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Smite.txt
-Steam War Thunder|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20War%20Thunder.txt
-Steam Warframe|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Warframe.txt
-Steam World of Tanks Blitz|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20World%20of%20Tanks%20Blitz.txt
-Steam World of Warships|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20World%20of%20Warships.txt
 Valorant|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Valorant.txt
