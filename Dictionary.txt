@@ -15,3 +15,5 @@
 "BullSF Launcher", "BullSF Launcher"
 "SF Alpha Launcher","SF Alpha"
 "Knives Out","Knives Out"
+"Steam Dota 2","Steam Dota 2"
+"Administrator: Steam Dota 2","Administrator: Steam Dota 2"
