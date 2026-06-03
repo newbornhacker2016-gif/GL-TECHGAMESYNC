@@ -6,7 +6,7 @@ League Of Legends|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TEC
 Roblox Player|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Roblox.txt
 Roblox Studio|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/RobloxStudio.txt
 SF Alpha|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/SFAlpha.txt
-SFRush|https://github.com/newbornhacker2016-gif/GL-TECHGAMESYNC/blob/main/SFRush.txt
+SFRush|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/SFRush.txt
 Steam Apex Legends|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Apex%20Legends.txt
 Steam Call of Duty Warzone|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Call%20of%20Duty%20Warzone.txt
 Steam Counter-Strike 2|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Counter-Strike%202.txt
