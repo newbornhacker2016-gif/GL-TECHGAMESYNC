@@ -17,3 +17,6 @@
 "Knives Out","Knives Out"
 "Steam Dota 2","Steam Dota 2"
 "Administrator: Steam Dota 2","Administrator: Steam Dota 2"
+"SF Rush","Special Force"
+"Special Force","Special Force"
+"SFRush","SFRush"
