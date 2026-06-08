@@ -1,9 +1,9 @@
-name: Steam LoL
+name: Riot LOL
 
 on:
   schedule:
-    - cron: '0 4 * * *' # Runs daily at 4:00 AM UTC (gives Riot time to publish)
-  workflow_dispatch: # Allows manual runs via the website
+    - cron: '0 4 * * *' # Automated daily run at 4:00 AM UTC
+  workflow_dispatch: # Enable manual force triggers via GitHub UI
 
 permissions:
   contents: write
@@ -12,7 +12,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  check-lol-patch:
+  check-lol:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
@@ -27,22 +27,23 @@ jobs:
       run: |
         pip install requests beautifulsoup4
 
-    - name: Run LoL Patch Checker
-      run: python Site/Steam/Dota2/check_lol_patch.py
+    - name: Run Scraper Script
+      run: python Site/Riot/Riot_LOL.py
 
-    - name: Commit and Push changes if updated
+    - name: Commit and Push Updates
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        git add Site/Steam/Dota2/last_lol_patch.txt || true
-        git add "Steam/League Of Legends.txt" || true
+        # Track the custom path adjustments
+        git add Site/Riot/last_lol_patch.txt || true
+        git add LeagueOfLegend.txt || true
         
         if git diff --staged --quiet; then
-          echo "No new League patch data to commit today."
+          echo "No new changes detected to save."
         else
-          git commit -m "Update: New League of Legends Patch Notes"
+          git commit -m "Update: New LoL Patch Notes Extracted"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
         fi
