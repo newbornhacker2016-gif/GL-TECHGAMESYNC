@@ -32,17 +32,12 @@ def get_latest_lol_patch_url():
         return None
 
 def extract_version_number(url):
-    # Example URL: https://www.leagueoflegends.com/en-ph/news/game-updates/league-of-legends-patch-26-11-notes/
-    # We want to extract "26-11" and turn it into "26.11"
-    
-    # Search for numbers separated by dashes or dots following the word 'patch'
+    # Extracts numbers following the word 'patch' (e.g. patch-26-11 -> 26.11)
     match = re.search(r'patch-(\d+)[-.](\d+)', url.lower())
     if match:
-        major = match.group(1)
-        minor = match.group(2)
-        return f"{major}.{minor}"
+        return f"{match.group(1)}.{match.group(2)}"
     
-    # Fallback: look for any version number format like XX.XX or XX-XX in the URL string
+    # Fallback pattern match
     match_fallback = re.search(r'(\d+)[-.](\d+)', url)
     if match_fallback:
         return f"{match_fallback.group(1)}.{match_fallback.group(2)}"
@@ -58,30 +53,20 @@ def main():
         return
 
     print(f"Discovered Live Patch URL: {latest_url}")
-    
-    # Extract just the clean string (e.g., "26.11")
     version_only = extract_version_number(latest_url)
     print(f"Extracted Patch Version: {version_only}")
     
-    last_saved_url = ""
-    if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, "r") as f:
-            last_saved_url = f.read().strip()
-            
-    # Run update if url is new or if the output file was cleared/missing
-    if latest_url != last_saved_url or not os.path.exists(OUTPUT_FILE):
-        print(f"Writing clean version number '{version_only}' to text file...")
+    # --- TEMPORARILY REMOVED SAFETY GATE TO FORCE THE OVERWRITE ---
+    print(f"Writing clean version number '{version_only}' to text file...")
+    
+    # Wipes out the 694 lines completely and replaces it with just the version number
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        f.write(version_only)
         
-        # Overwrites the file completely so it contains ONLY the patch number string
-        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-            f.write(version_only)
-            
-        with open(HISTORY_FILE, "w") as f:
-            f.write(latest_url)
-            
-        print(f"Successfully saved to {OUTPUT_FILE}")
-    else:
-        print("The tracked file matches the live page version. No update required.")
+    with open(HISTORY_FILE, "w") as f:
+        f.write(latest_url)
+        
+    print(f"Successfully saved to {OUTPUT_FILE}")
 
 if __name__ == "__main__":
     main()
