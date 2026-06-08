@@ -5,8 +5,9 @@ on:
     - cron: '0 0 * * *' # Runs daily at midnight UTC
   workflow_dispatch: # Allows manual runs
 
+# This block is required to clear Exit Code 128
 permissions:
-  contents: write # Crucial: Gives the workflow permission to commit changes back to your repo
+  contents: write
 
 jobs:
   check-patch:
@@ -25,16 +26,23 @@ jobs:
         pip install requests beautifulsoup4
 
     - name: Run Patch Checker
-      # Points to the exact subfolder where your script lives
       run: python Site/Steam/Dota2/check_patch.py
 
     - name: Commit and Push changes if updated
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        # Stage the specific target files
-        git add "Site/Steam/Dota2/last_patch.txt" "Steam/Steam Dota 2.txt"
+        # Explicitly stage files
+        git add Site/Steam/Dota2/last_patch.txt || true
+        git add "Steam/Steam Dota 2.txt" || true
         
-        # Check if there are changes before committing to avoid workflow errors
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update: New Dota 2 Patch Notes" && git push)
+        # Check if there are changes to commit. If none, exit cleanly instead of failing.
+        if git diff --staged --quiet; then
+          echo "No new patch data to commit today."
+        else
+          git commit -m "Update: New Dota 2 Patch Notes"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+        fi
