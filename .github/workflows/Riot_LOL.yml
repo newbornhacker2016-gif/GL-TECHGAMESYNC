@@ -2,8 +2,8 @@ name: Riot LOL
 
 on:
   schedule:
-    - cron: '0 4 * * *' # Automated daily run at 4:00 AM UTC
-  workflow_dispatch: # Enable manual force triggers via GitHub UI
+    - cron: '0 4 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -37,12 +37,11 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        # Track the custom path adjustments
         git add Site/Riot/last_lol_patch.txt || true
         git add LeagueOfLegend.txt || true
         
         if git diff --staged --quiet; then
-          echo "No new changes detected to save."
+          echo "No changes found to push."
         else
           git commit -m "Update: New LoL Patch Notes Extracted"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
