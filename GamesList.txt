@@ -13,4 +13,3 @@ Steam Counter-Strike 2|https://raw.githubusercontent.com/newbornhacker2016-gif/G
 Steam Dota 2|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Dota%202.txt
 Steam Farlight 84|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Farlight%2084.txt
 Valorant|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Valorant.txt
-JuanFi Flasher|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Juanfi.txt
