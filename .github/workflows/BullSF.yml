@@ -2,8 +2,8 @@ name: BullSF
 
 on:
   schedule:
-    - cron: '0 * * * *' # Automated check running loop every hour
-  workflow_dispatch: # Enable manual force triggers via GitHub UI
+    - cron: '0 * * * *' # Automated hourly check trigger background loop
+  workflow_dispatch: # Enable manual force trigger button
 
 permissions:
   contents: write
@@ -41,8 +41,8 @@ jobs:
         git add BullSF.txt || true
         
         if git diff --staged --quiet; then
-          echo "No patch variance discovered to push."
+          echo "No version changes discovered to save."
         else
-          git commit -m "Update: New BullSF Version Code Tracked"
+          git commit -m "Update: New BullSF Launcher Version Tracked"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
         fi
