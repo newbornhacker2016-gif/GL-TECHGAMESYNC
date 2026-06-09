@@ -2,7 +2,7 @@ name: Steam Dota2
 
 on:
   schedule:
-    - cron: '0 * * * *' # Automatically checks every hour
+    - cron: '0 */2 * * *' # Automatically checks every hour
   workflow_dispatch: # Allows manual runs
 
 permissions:
