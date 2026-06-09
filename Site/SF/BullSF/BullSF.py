@@ -2,40 +2,39 @@ import os
 import re
 import requests
 
-# The direct launcher short-link that triggers the redirect download
 MAIN_URL = "https://link.bullgamez.com/launcher"
 HISTORY_FILE = "Site/SF/BullSF/last_bullsf_patch.txt"
 OUTPUT_FILE = "BullSF.txt"
 
 def get_latest_bullsf_version():
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
-        # allow_redirects=True allows us to follow the path straight to the final .zip download URL
-        # We use requests.head so it reads the URL title instantly without downloading the zip data!
-        response = requests.head(MAIN_URL, headers=headers, allow_redirects=True, timeout=15)
+        # Create a real browser header identity session to bypass bot firewalls
+        session = requests.Session()
+        session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5"
+        })
         
-        # Fallback to a standard get stream if the host blockades HEAD calls
-        if response.status_code not in [200, 301, 302]:
-            response = requests.get(MAIN_URL, headers=headers, allow_redirects=True, stream=True, timeout=15)
-            
+        # stream=True loads only the link text destination without downloading the actual large zip file package
+        response = session.get(MAIN_URL, allow_redirects=True, stream=True, timeout=15)
+        
         final_url = response.url
-        print(f"Final Destination URL: {final_url}")
+        print(f"Final Redirection Link: {final_url}")
         
-        # Regex search for 'LauncherV' followed by numbers (captures V111 or similar pattern elements)
+        # Match 'LauncherV' followed by numbers (e.g., LauncherV111 -> V111)
         match = re.search(r'Launcher(V\d+)', final_url, re.IGNORECASE)
         if match:
-            return match.group(1) # This isolates exactly "V111"
+            return match.group(1).upper() # Ensures standard formatting like V111
             
-        # Generic safety fallback regex looking for any lone V+digits variant in the link
+        # Fallback to search for any V + digits sequence in the path string
         match_fallback = re.search(r'(V\d+)', final_url, re.IGNORECASE)
         if match_fallback:
-            return match_fallback.group(1)
+            return match_fallback.group(1).upper()
             
-        return None
+        return "Unknown Version"
     except Exception as e:
-        print(f"Error resolving download link redirect: {e}")
+        print(f"Connection/Redirection Error: {e}")
         return None
 
 def main():
@@ -44,21 +43,20 @@ def main():
     
     latest_version = get_latest_bullsf_version()
     if not latest_version:
-        print("Could not parse out a specific version string pattern from the link layout.")
+        print("Could not isolate a valid download URL path destination.")
         return
 
-    print(f"Isolated Version Output: {latest_version}")
+    print(f"Parsed Target Match: {latest_version}")
+    print(f"Writing clean target code '{latest_version}' to tracking files...")
     
-    # Bypassing historical gates to write immediately on your first testing action run
-    print(f"Writing clean target launcher value '{latest_version}' to tracking logs...")
-    
+    # Clean overwrite format output
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(latest_version)
         
     with open(HISTORY_FILE, "w") as f:
         f.write(latest_version)
         
-    print(f"Successfully configured and outputted data to {OUTPUT_FILE}")
+    print(f"Successfully processed and updated {OUTPUT_FILE}")
 
 if __name__ == "__main__":
     main()
