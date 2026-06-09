@@ -1,1 +1,54 @@
+name: Steam Counter-Strike 2
 
+on:
+  schedule:
+    - cron: '0 */2 * * *' # Automatically triggers every 2 hours
+  workflow_dispatch: # Keeps manual user trigger panel active
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  check-cs2:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: |
+        pip install requests beautifulsoup4
+
+    - name: Run Scraper Script
+      run: |
+        SCRIPT_PATH=$(find . -name "Steam_CSGO2.py" -print -quit)
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "Error: Could not locate Steam_CSGO2.py script file!"
+          exit 1
+        fi
+        python "$SCRIPT_PATH"
+
+    - name: Commit and Push Updates
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name "GitHub Action Bot"
+        git config --global user.email "actions@github.com"
+        
+        git add "Steam/Steam Counter-Strike 2.txt" || true
+        git add **/last_cs2_patch.txt || true
+        
+        if git diff --staged --quiet; then
+          echo "No patch date discrepancies found."
+        else
+          git commit -m "Update: Logged latest CS2 update date string"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+        fi
