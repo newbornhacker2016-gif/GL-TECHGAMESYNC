@@ -3,7 +3,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-# Scrapes their direct landing page layout where the text 'Launcher V111' is written out
+# Scrapes the primary web landing page 
 MAIN_PAGE_URL = "https://sf.bullgamez.com/"
 HISTORY_FILE = "Site/SF/BullSF/last_bullsf_patch.txt"
 OUTPUT_FILE = "BullSF.txt"
@@ -16,36 +16,45 @@ def get_latest_bullsf_version():
         
         response = requests.get(MAIN_PAGE_URL, headers=headers, timeout=15)
         if response.status_code != 200:
-            print(f"Failed to access layout text: Status {response.status_code}")
-            return "V111" # Failsafe fallback string to prevent action workflow crash
+            print(f"Failed to load main page: Status {response.status_code}")
+            return "V111" # Safe fallback
             
         soup = BeautifulSoup(response.text, 'html.parser')
-        page_text = soup.get_text()
         
-        # Searches for text string variants like "Launcher V111" or "Launcher V112"
-        match = re.search(r'Launcher\s*(V\d+)', page_text, re.IGNORECASE)
-        if match:
-            return match.group(1).upper()
-            
-        # Fallback regex lookaround check if elements shift spacing
-        match_fallback = re.search(r'(V\d+)', page_text, re.IGNORECASE)
-        if match_fallback:
-            return match_fallback.group(1).upper()
+        # 1. Target the exact download link structure from the HTML snippet
+        links = soup.find_all('a', href=True)
+        for link in links:
+            href = link['href']
+            # Match the exact link destination
+            if "link.bullgamez.com/launcher" in href.lower():
+                link_text = link.get_text().strip()
+                print(f"Found targeted download link text: {link_text}")
+                
+                # Extract 'V111' from the text inside the link using Regex
+                match = re.search(r'(V\d+)', link_text, re.IGNORECASE)
+                if match:
+                    return match.group(1).upper()
+
+        # 2. Backup Fallback: Scan the entire page text if the exact link structure shifts
+        page_text = soup.get_text()
+        match_text = re.search(r'Launcher\s*(V\d+)', page_text, re.IGNORECASE)
+        if match_text:
+            return match_text.group(1).upper()
             
         return "V111"
+        
     except Exception as e:
         print(f"Scraper error encountered: {e}")
-        return "V111" # Safe backup return code
+        return "V111"
 
 def main():
     os.makedirs(os.path.dirname(HISTORY_FILE), exist_ok=True)
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     
     latest_version = get_latest_bullsf_version()
-    print(f"Discovered Live Code Target: {latest_version}")
+    print(f"Isolated Version Output: {latest_version}")
     
-    # Force updating target destination file
-    print(f"Writing clear code '{latest_version}' to tracking systems...")
+    print(f"Writing clean code '{latest_version}' to tracking logs...")
     
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         f.write(latest_version)
