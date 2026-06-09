@@ -2,8 +2,8 @@ name: BullSF
 
 on:
   schedule:
-    - cron: '0 * * * *' # Automated hourly check trigger background loop
-  workflow_dispatch: # Enable manual force trigger button
+    - cron: '0 * * * *' # Automatically runs every single hour
+  workflow_dispatch: # Keeps your manual "Run workflow" button active
 
 permissions:
   contents: write
@@ -23,12 +23,16 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install Dependencies
-      run: |
-        pip install requests
-
     - name: Run Scraper Script
-      run: python Site/SF/BullSF/BullSF.py
+      # This command tells GitHub to look for BullSF.py ANYWHERE in your repository,
+      # so even if there's a folder typo, it will find it and run it!
+      run: |
+        SCRIPT_PATH=$(find . -name "BullSF.py" -print -quit)
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "Error: Could not find BullSF.py anywhere in the repo!"
+          exit 1
+        fi
+        python "$SCRIPT_PATH"
 
     - name: Commit and Push Updates
       env:
@@ -37,12 +41,14 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        git add Site/SF/BullSF/last_bullsf_patch.txt || true
+        # Track the text files wherever they were created
+        git add *.txt || true
+        git add **/last_bullsf_patch.txt || true
         git add BullSF.txt || true
         
         if git diff --staged --quiet; then
-          echo "No version changes discovered to save."
+          echo "No changes found."
         else
-          git commit -m "Update: New BullSF Launcher Version Tracked"
+          git commit -m "Update: Force update BullSF version string"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
         fi
