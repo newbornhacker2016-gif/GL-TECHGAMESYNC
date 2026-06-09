@@ -1,1 +1,48 @@
+name: BullSF
 
+on:
+  schedule:
+    - cron: '0 * * * *' # Automated check running loop every hour
+  workflow_dispatch: # Enable manual force triggers via GitHub UI
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  check-bullsf:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: |
+        pip install requests
+
+    - name: Run Scraper Script
+      run: python Site/SF/BullSF/BullSF.py
+
+    - name: Commit and Push Updates
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name "GitHub Action Bot"
+        git config --global user.email "actions@github.com"
+        
+        git add Site/SF/BullSF/last_bullsf_patch.txt || true
+        git add BullSF.txt || true
+        
+        if git diff --staged --quiet; then
+          echo "No patch variance discovered to push."
+        else
+          git commit -m "Update: New BullSF Version Code Tracked"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+        fi
