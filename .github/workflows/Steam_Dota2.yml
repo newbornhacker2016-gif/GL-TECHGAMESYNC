@@ -2,10 +2,9 @@ name: Steam Dota2
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs daily at midnight UTC
+    - cron: '0 * * * *' # Automatically checks every hour
   workflow_dispatch: # Allows manual runs
 
-# This block is required to clear Exit Code 128
 permissions:
   contents: write
 
@@ -26,7 +25,8 @@ jobs:
         pip install requests beautifulsoup4
 
     - name: Run Patch Checker
-      run: python Site/Steam/Dota2/check_patch.py
+      # FIXED: Now points directly to your new file location
+      run: python Site/Steam/Steam_Dota2.py
 
     - name: Commit and Push changes if updated
       env:
@@ -35,11 +35,10 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        # Explicitly stage files
-        git add Site/Steam/Dota2/last_patch.txt || true
+        # FIXED: Staging the correct file locations adjusted inside the script
+        git add Site/Steam/last_patch.txt || true
         git add "Steam/Steam Dota 2.txt" || true
         
-        # Check if there are changes to commit. If none, exit cleanly instead of failing.
         if git diff --staged --quiet; then
           echo "No new patch data to commit today."
         else
