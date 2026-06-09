@@ -3,7 +3,7 @@ name: Roblox Player
 on:
   schedule:
     - cron: '0 */2 * * *' # Automatically runs every 2 hours
-  workflow_dispatch: # Manual dashboard trigger play button
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -31,7 +31,7 @@ jobs:
       run: |
         SCRIPT_PATH=$(find . -name "Roblox_Player.py" -print -quit)
         if [ -z "$SCRIPT_PATH" ]; then
-          echo "Error: Could not locate Roblox_Player.py script file!"
+          echo "Error: Could not locate Roblox_Player.py!"
           exit 1
         fi
         python "$SCRIPT_PATH"
@@ -47,8 +47,8 @@ jobs:
         git add **/last_roblox_patch.txt || true
         
         if git diff --staged --quiet; then
-          echo "No new version updates discovered."
+          echo "No new updates found."
         else
-          git commit -m "Update: Extracted latest Roblox installer version"
+          git commit -m "Update: Extracted Roblox hash"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
         fi
