@@ -7,13 +7,14 @@ from bs4 import BeautifulSoup
 MAIN_URL = "https://www.dota2.com/patches"
 
 # Adjusted Paths relative to the root directory where the GitHub Action runs
-# Saves history in the same folder as the script to keep things clean
-HISTORY_FILE = "Site/Steam/Dota2/last_patch.txt" 
-# Saves the final text output directly to your target file
+HISTORY_FILE = "Site/Steam/last_patch.txt" 
 OUTPUT_FILE = "Steam/Steam Dota 2.txt"
 
 def get_latest_patch_url():
-    response = requests.get(MAIN_URL)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    response = requests.get(MAIN_URL, headers=headers)
     if response.status_code != 200:
         print("Failed to access Dota 2 patches page")
         return None
@@ -30,16 +31,19 @@ def get_latest_patch_url():
             
     return patch_urls[0] if patch_urls else None
 
-def extract_text_from_patch(url):
-    response = requests.get(url)
-    if response.status_code != 200:
-        return "Failed to fetch specific patch notes."
-    
-    soup = BeautifulSoup(response.text, 'html.parser')
-    for script in soup(["script", "style"]):
-        script.extract()
+def extract_version_number(url):
+    # Example URL: https://www.dota2.com/patches/7.41c
+    # This extracts anything after the /patches/ folder matching a number format
+    match = re.search(r'patches/(7\.\d+[a-z]?)', url.lower())
+    if match:
+        return match.group(1)
         
-    return soup.get_text(separator="\n", strip=True)
+    # Fallback: just look for the first string pattern that looks like 7.XX
+    match_fallback = re.search(r'(7\.\d+[a-z]?)', url.lower())
+    if match_fallback:
+        return match_fallback.group(1)
+        
+    return "Unknown Version"
 
 def main():
     # Ensure the target folders exist before trying to save files
@@ -53,26 +57,21 @@ def main():
 
     print(f"Current live patch URL: {latest_url}")
     
-    last_saved_url = ""
-    if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, "r") as f:
-            last_saved_url = f.read().strip()
-            
-    if latest_url != last_saved_url:
-        print("New patch detected! Extracting text...")
+    # Extract just the clean version string (e.g., "7.41c")
+    version_only = extract_version_number(latest_url)
+    print(f"Extracted Patch Version: {version_only}")
+    
+    # --- WE REMOVE THE SAFETY GATE CHECK FOR THE FIRST RUN TO FORCE THE CLEAN OVERWRITE ---
+    print(f"Writing clean version number '{version_only}' to text file...")
+    
+    # Wipes out the full page paragraphs completely and leaves ONLY the version number
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        f.write(version_only)
         
-        with open(HISTORY_FILE, "w") as f:
-            f.write(latest_url)
-            
-        text_output = extract_text_from_patch(latest_url)
+    with open(HISTORY_FILE, "w") as f:
+        f.write(latest_url)
         
-        # Overwrites or saves the plain text patch notes directly to Steam/Steam Dota 2.txt
-        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-            f.write(text_output)
-            
-        print(f"Text-only output saved to {OUTPUT_FILE}")
-    else:
-        print("No new patch detected since yesterday.")
+    print(f"Text-only version number saved to {OUTPUT_FILE}")
 
 if __name__ == "__main__":
     main()
