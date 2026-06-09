@@ -1,1 +1,48 @@
+name: Bloodstrike
 
+on:
+  schedule:
+    - cron: '0 * * * *' # Automated daily schedule hourly check loop
+  workflow_dispatch: # Manual forced dashboard play trigger
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  check-bloodstrike:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: |
+        pip install requests beautifulsoup4
+
+    - name: Run Scraper Script
+      run: python Site/Bloodstrike/Bloodstrike.py
+
+    - name: Commit and Push Updates
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name "GitHub Action Bot"
+        git config --global user.email "actions@github.com"
+        
+        git add Site/Bloodstrike/last_bloodstrike_patch.txt || true
+        git add Bloodstrike.txt || true
+        
+        if git diff --staged --quiet; then
+          echo "No patch date variance discovered to push."
+        else
+          git commit -m "Update: New Blood Strike Version Date Tracked"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+        fi
