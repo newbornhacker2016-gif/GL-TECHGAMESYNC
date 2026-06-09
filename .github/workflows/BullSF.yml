@@ -2,7 +2,7 @@ name: BullSF
 
 on:
   schedule:
-    - cron: '0 * * * *' # Automatically runs every single hour
+    - cron: '0 */2 * * *' # Automatically runs every single hour
   workflow_dispatch: # Keeps your manual "Run workflow" button active
 
 permissions:
