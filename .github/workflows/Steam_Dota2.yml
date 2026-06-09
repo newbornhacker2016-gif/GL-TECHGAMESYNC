@@ -1,4 +1,4 @@
-name: Check Dota 2 Patch Updates
+name: Steam Dota2
 
 on:
   schedule:
