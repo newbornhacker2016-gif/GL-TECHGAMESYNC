@@ -2,7 +2,7 @@ name: Bloodstrike
 
 on:
   schedule:
-    - cron: '0 * * * *' # Automated daily schedule hourly check loop
+    - cron: '0 */2 * * *' # Automated daily schedule hourly check loop
   workflow_dispatch: # Manual forced dashboard play trigger
 
 permissions:
