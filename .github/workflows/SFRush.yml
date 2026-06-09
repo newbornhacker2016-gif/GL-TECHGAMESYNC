@@ -1,1 +1,55 @@
+name: SFRush
 
+on:
+  schedule:
+    - cron: '0 */2 * * *' # Automatically runs background loop evaluation every 2 hours
+  workflow_dispatch: # Maintains manual execution option panel
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  check-sfrush:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: |
+        pip install requests beautifulsoup4
+
+    - name: Run Scraper Script
+      # Searches the tree branch paths dynamically to execute the scraper seamlessly
+      run: |
+        SCRIPT_PATH=$(find . -name "SFRush.py" -print -quit)
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "Error: Could not find SFRush.py file anywhere in repository directory arrays!"
+          exit 1
+        fi
+        python "$SCRIPT_PATH"
+
+    - name: Commit and Push Updates
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name "GitHub Action Bot"
+        git config --global user.email "actions@github.com"
+        
+        git add SFRush.txt || true
+        git add **/last_sfrush_patch.txt || true
+        
+        if git diff --staged --quiet; then
+          echo "No patch date discrepancies found on game portal."
+        else
+          git commit -m "Update: Logged latest Special Force Rush patch signature text"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+        fi
