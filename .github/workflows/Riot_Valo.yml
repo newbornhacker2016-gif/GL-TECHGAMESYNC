@@ -2,8 +2,8 @@ name: Riot Valo
 
 on:
   schedule:
-    - cron: '0 */2 * * *' # Automated daily run at 5:00 AM UTC
-  workflow_dispatch: # Enable manual force triggers via GitHub UI
+    - cron: '0 */2 * * *' # Wakes up automatically every 2 hours to check the clock
+  workflow_dispatch: # Allows manual force runs
 
 permissions:
   contents: write
@@ -28,7 +28,13 @@ jobs:
         pip install requests beautifulsoup4
 
     - name: Run Scraper Script
-      run: python Site/Riot/Riot_Valo.py
+      run: |
+        SCRIPT_PATH=$(find . -name "Riot_Valo.py" -print -quit)
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "Error: Could not find Riot_Valo.py!"
+          exit 1
+        fi
+        python "$SCRIPT_PATH"
 
     - name: Commit and Push Updates
       env:
@@ -37,11 +43,11 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        git add Site/Riot/last_valo_patch.txt || true
+        git add **/last_valo_patch.txt || true
         git add Valorant.txt || true
         
         if git diff --staged --quiet; then
-          echo "No changes found to push."
+          echo "No changes found to push or currently locked inside timing gates."
         else
           git commit -m "Update: New Valorant Patch Notes Extracted"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
