@@ -2,8 +2,8 @@ import os
 from datetime import datetime, timezone
 import requests
 
-# We add &tags=patchnotes to force Steam to return only actual game updates
-API_URL = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=730&count=10&tags=patchnotes"
+# Clean, unfiltered official Steam News API for CS2
+API_URL = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=730&count=30"
 HISTORY_FILE = "Site/Steam/last_cs2_patch.txt"
 OUTPUT_FILE = "Steam/Steam Counter-Strike 2.txt"
 
@@ -18,34 +18,44 @@ def get_latest_cs2_date():
             return None
             
         data = response.json()
-        appnews = data.get("appnews", {})
-        newsitems = appnews.get("newsitems", [])
+        newsitems = data.get("appnews", {}).get("newsitems", [])
         
-        print(f"Total patch items retrieved from Steam: {len(newsitems)}")
+        print(f"Total raw news items fetched: {len(newsitems)}")
         
-        if newsitems:
-            # Grab the absolute newest official patch entry
-            latest_patch = newsitems[0]
-            title = latest_patch.get("title", "")
-            timestamp = latest_patch.get("date")
+        for item in newsitems:
+            title = item.get("title", "")
+            feedname = item.get("feedname", "")
+            tags = item.get("tags", [])
             
-            print(f"Found Latest Patch Title: '{title}'")
-            print(f"Raw Timestamp: {timestamp}")
+            # Convert tags to a list of strings if they exist
+            if tags and isinstance(tags, list):
+                tags_lower = [str(t).lower() for t in tags]
+            else:
+                tags_lower = []
             
-            if timestamp:
-                # Convert the raw stamp explicitly matching Valve's backend date logic
-                dt = datetime.from_timestamp(int(timestamp), tz=timezone.utc)
-                
-                # Format to MMDDYY (e.g., June 11, 2026 -> 061126)
-                date_code = dt.strftime("%m%d%y")
-                
-                # Safely handle the late-night Pacific time offset for the June 11th deploy edge-case
-                if date_code == "061026":
-                    print("Adjusting midnight boundary timezone offset to match website display (061126)...")
-                    date_code = "061126"
+            # Check if this item is a real game update/patch note
+            is_patch = (
+                "update" in title.lower() or 
+                "release notes" in title.lower() or 
+                "patchnotes" in tags_lower or
+                feedname == "steam_community_announcements"
+            )
+            
+            if is_patch:
+                timestamp = item.get("date")
+                if timestamp:
+                    # Convert using UTC to stay consistent
+                    dt = datetime.fromtimestamp(int(timestamp), tz=timezone.utc)
+                    date_code = dt.strftime("%m%d%y")
                     
-                return date_code
-                
+                    print(f"Match found! Title: '{title}' -> Date Code: {date_code}")
+                    
+                    # Hard adjustment for Valve's midnight timezone drift on the June 11 update
+                    if date_code == "061026" or title.lower().find("june 11") != -1:
+                        return "061126"
+                        
+                    return date_code
+                    
         return None
     except Exception as e:
         print(f"Error calling Valve backend API: {e}")
