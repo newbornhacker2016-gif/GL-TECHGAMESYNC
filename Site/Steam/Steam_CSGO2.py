@@ -3,8 +3,8 @@ import re
 from datetime import datetime
 import requests
 
-# We query Valve's direct public news engine feed API to bypass client-side rendering blockades
-API_URL = "https://www.counter-strike.net/api/v1/news/?appids=270&count=5"
+# Use the official Steam Web API with the correct AppID for Counter-Strike 2 (730)
+API_URL = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=730&count=5"
 HISTORY_FILE = "Site/Steam/last_cs2_patch.txt"
 OUTPUT_FILE = "Steam/Steam Counter-Strike 2.txt"
 
@@ -19,15 +19,19 @@ def get_latest_cs2_date():
             return None
             
         data = response.json()
-        # Navigate through the JSON post logs returned by Valve
-        if "newsitems" in data and len(data["newsitems"]) > 0:
+        
+        # The official API response structure nests newsitems inside 'appnews'
+        appnews = data.get("appnews", {})
+        newsitems = appnews.get("newsitems", [])
+        
+        if len(newsitems) > 0:
             # Grab the absolute newest post entry
-            latest_post = data["newsitems"][0]
+            latest_post = newsitems[0]
             timestamp = latest_post.get("date") # Returns UNIX time like 1779974400
             
             if timestamp:
                 dt = datetime.fromtimestamp(int(timestamp))
-                # Convert date formatting structure to MMDDYY (e.g., May 29, 2026 -> 052926)
+                # Convert date formatting structure to MMDDYY (e.g., June 22, 2026 -> 062226)
                 return dt.strftime("%m%d%y")
                 
         return None
