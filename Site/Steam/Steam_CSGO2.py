@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime
+from datetime import timezone
 import requests
 
 # Use the official Steam Web API with the correct AppID for Counter-Strike 2 (730)
@@ -29,10 +29,10 @@ def get_latest_cs2_date():
             latest_post = newsitems[0]
             timestamp = latest_post.get("date") # Returns UNIX time like 1779974400
             
-            if timestamp:
-                dt = datetime.fromtimestamp(int(timestamp))
-                # Convert date formatting structure to MMDDYY (e.g., June 22, 2026 -> 062226)
-                return dt.strftime("%m%d%y")
+           if timestamp:
+    # Use timezone-aware UTC conversion
+    dt = datetime.fromtimestamp(int(timestamp), tz=timezone.utc)
+    return dt.strftime("%m%d%y")
                 
         return None
     except Exception as e:
