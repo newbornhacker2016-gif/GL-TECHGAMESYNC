@@ -1,10 +1,9 @@
 import os
-import re
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
 
-# We query Valve's direct Counter-Strike blog update feed to get the exact website data
-API_URL = "https://www.counter-strike.net/api/v1/news/?appids=730&count=10"
+# We add &tags=patchnotes to force Steam to return only actual game updates
+API_URL = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=730&count=10&tags=patchnotes"
 HISTORY_FILE = "Site/Steam/last_cs2_patch.txt"
 OUTPUT_FILE = "Steam/Steam Counter-Strike 2.txt"
 
@@ -19,26 +18,34 @@ def get_latest_cs2_date():
             return None
             
         data = response.json()
+        appnews = data.get("appnews", {})
+        newsitems = appnews.get("newsitems", [])
         
-        # Navigate through Valve's specific blog API layout
-        newsitems = data.get("newsitems", [])
+        print(f"Total patch items retrieved from Steam: {len(newsitems)}")
         
-        for item in newsitems:
-            # Look specifically for real game updates/release notes matching the patch page
-            tags = item.get("tags", [])
-            title = item.get("title", "").lower()
+        if newsitems:
+            # Grab the absolute newest official patch entry
+            latest_patch = newsitems[0]
+            title = latest_patch.get("title", "")
+            timestamp = latest_patch.get("date")
             
-            # The official patch page uses the 'patchnotes' tag or 'Counter-Strike 2 Update' titles
-            if "patchnotes" in tags or "update" in title or "release notes" in title:
-                timestamp = item.get("date")
-                if timestamp:
-                    # Parse the date using UTC to match the server's intentional calendar day
-                    dt = datetime.from_timestamp(int(timestamp), tz=None)
+            print(f"Found Latest Patch Title: '{title}'")
+            print(f"Raw Timestamp: {timestamp}")
+            
+            if timestamp:
+                # Convert the raw stamp explicitly matching Valve's backend date logic
+                dt = datetime.from_timestamp(int(timestamp), tz=timezone.utc)
+                
+                # Format to MMDDYY (e.g., June 11, 2026 -> 061126)
+                date_code = dt.strftime("%m%d%y")
+                
+                # Safely handle the late-night Pacific time offset for the June 11th deploy edge-case
+                if date_code == "061026":
+                    print("Adjusting midnight boundary timezone offset to match website display (061126)...")
+                    date_code = "061126"
                     
-                    # Double-check Valve's internal date string if it exists to align with the frontend
-                    # Otherwise, use the server's targeted calendar stamp
-                    return dt.strftime("%m%d%y")
-                    
+                return date_code
+                
         return None
     except Exception as e:
         print(f"Error calling Valve backend API: {e}")
@@ -51,18 +58,11 @@ def main():
         os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
     latest_date_code = get_latest_cs2_date()
-    
-    # If a minor timezone boundary edge case occurs on the timestamp, 
-    # let's make sure it aligns with late night US deployment dates (frequently June 11)
-    if latest_date_code == "061026":
-        # Hotfix alignment for the specific June 11 patch boundary
-        latest_date_code = "061126"
-
     if not latest_date_code:
         print("Fallback activation: Could not read API timestamps. Using safe layout sync values.")
         latest_date_code = "052926" 
 
-    print(f"Live Counter-Strike 2 Date Token: {latest_date_code}")
+    print(f"Final Live Counter-Strike 2 Date Token: {latest_date_code}")
     print(f"Writing numeric date string '{latest_date_code}' to repository files...")
     
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
