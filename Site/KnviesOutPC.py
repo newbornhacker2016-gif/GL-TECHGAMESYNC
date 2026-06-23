@@ -2,63 +2,50 @@ import os
 import re
 import requests
 
-
 def update_knives_out_version():
-    # Target download tracking link
-    url = "https://adl.netease.com/d/g/knivesout/c/gwna"
+    # Bypassing the shortlink and pointing directly to the global/regional distribution API
+    # 750302 is your specific client package ID
+    url = "https://adl.netease.com/d/g/knivesout/c/gwna?id=750302"
 
-    # Browser headers to trick the server into thinking we are an actual visitor
     headers = {
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
-        "Connection": "keep-alive",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     }
 
     try:
-        print(f"Fetching URL via Session: {url}")
+        print(f"Fetching targeted regional URL: {url}")
         session = requests.Session()
-
-        # Step 1: Hit the link and allow full handling
+        
+        # Explicitly hitting the endpoint
         response = session.get(url, headers=headers, allow_redirects=True)
         final_url = response.url
 
-        # Step 2: If it didn't change from the original, look inside the HTML body 
-        # NetEase often uses `<meta http-equiv="refresh" content="0;url=... ">` or JS scripts to redirect
-        if "gwna" in final_url or ".exe" not in final_url:
-            print("Redirect not caught in headers. Inspecting page body for links...")
-            
-            # Find any cdn executable link hidden inside quotes/scripts/meta tags
-            urls_in_body = re.findall(r'(https?://[^\s"\'>]+\.exe[^\s"\'>]*)', response.text)
+        # Check body if redirect didn't jump instantly in the cloud instance
+        if "750302" not in final_url or ".exe" not in final_url:
+            cleaned_text = response.text.replace("\\/", "/")
+            # Look specifically for the 750302 package link in the response body
+            urls_in_body = re.findall(r'(https?://[^\s"\'>]+750302[^\s"\'>]*\.exe[^\s"\'>]*)', cleaned_text)
             if urls_in_body:
                 final_url = urls_in_body[0]
-            else:
-                # Fallback: Sometimes they serve a JSON string or dynamic config block
-                # Let's clean out escaping characters common in JS bodies (\/)
-                cleaned_text = response.text.replace("\\/", "/")
-                urls_in_body = re.findall(r'(https?://[^\s"\'>]+\.exe[^\s"\'>]*)', cleaned_text)
-                if urls_in_body:
-                    final_url = urls_in_body[0]
 
         print(f"Resolved to final URL: {final_url}")
 
-        # Step 3: Break down the filename
         filename = final_url.split("/")[-1].split("?")[0]
 
         if "-setup.exe" in filename:
             version_string = filename.replace("-setup.exe", "")
         else:
-            # Fallback regex matching string structure
-            match = re.search(r"([\w\.-]+-overseas-[\d\.]+)", filename)
+            match = re.search(r"(750302-[\w\.-]+)", filename)
             version_string = match.group(1) if match else filename
 
         print(f"Extracted Version String: {version_string}")
 
-        # Fallback security check: if parsing completely fails, don't break the original file
-        if version_string == "gwna" or not version_string:
-            raise ValueError("Failed to extract the direct download link from NetEase.")
+        if "gwna" in version_string or "650009" in version_string:
+            raise ValueError("Cloud routing returned fallback server. Aborting update to protect file.")
 
-        # Step 4: Write out to file
         txt_filename = "KnivesOutPC.txt"
         if not os.path.exists(txt_filename) and os.path.exists("../KnivesOutPC.txt"):
             txt_filename = "../KnivesOutPC.txt"
@@ -70,7 +57,6 @@ def update_knives_out_version():
 
     except Exception as e:
         print(f"An error occurred: {e}")
-
 
 if __name__ == "__main__":
     update_knives_out_version()
