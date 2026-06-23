@@ -4,8 +4,8 @@ import requests
 
 
 def update_knives_out_version():
-    # Force the query parameter for the launcher package ID (750302)
-    url = "https://adl.netease.com/d/g/knivesout/c/gwna?id=750302"
+    # Use the master route. We won't hardcode the package ID anymore.
+    url = "https://adl.netease.com/d/g/knivesout/c/gwna"
 
     headers = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
@@ -16,53 +16,40 @@ def update_knives_out_version():
     }
 
     try:
-        print(f"Fetching Launcher URL: {url}")
+        print(f"Fetching master distribution link: {url}")
         session = requests.Session()
 
+        # Follow redirects completely
         response = session.get(url, headers=headers, allow_redirects=True)
         final_url = response.url
+        
+        # Clean potential Javascript formatting backslashes out of the response body
+        page_content = response.text.replace("\\/", "/")
 
-        # If the tracking redirect brought us somewhere else, look directly into the response body
-        if "750302" not in final_url or ".exe" not in final_url:
-            print(
-                "Standard redirect missed the launcher. Scanning page payload for 750302 package link..."
-            )
-            cleaned_text = response.text.replace("\\/", "/")
+        # 1. Dynamic Extraction: Look for ANY package string pattern matching the launcher executable structure
+        # This matches: digits + "-hyxd-overseas-" + version numbers + "-setup.exe"
+        # Example target: 750302-hyxd-overseas-1.2.183.20260428153738.3195927-setup.exe
+        launcher_match = re.search(r'([\d]+-hyxd-overseas-[\d\.]+-setup\.exe)', page_content)
 
-            # Regex to hunt for any URL string containing '750302' and ending with '.exe'
-            urls_in_body = re.findall(
-                r'(https?://[^\s"\'>]+750302[^\s"\'>]*\.exe[^\s"\'>]*)',
-                cleaned_text,
-            )
-            if urls_in_body:
-                final_url = urls_in_body[0]
-            else:
-                # Absolute fallback: If the automated shortlink strips the ID completely on GitHub's end,
-                # we construct a direct predictable URL pattern used by NetEase's global CDN
-                print("Fallback: Constructing direct CDN endpoint path.")
-                final_url = "https://g83.gdl.netease.com/750302-hyxd-overseas-1.2.183.20260428153738.3195927-setup.exe"
-
-        print(f"Resolved to final Launcher URL: {final_url}")
-
-        # Extract filename (strip queries)
-        filename = final_url.split("/")[-1].split("?")[0]
-
-        # Clean down to the exact version string
-        if "-setup.exe" in filename:
+        if launcher_match:
+            filename = launcher_match.group(1)
+            print(f"Found dynamic launcher pattern in payload: {filename}")
             version_string = filename.replace("-setup.exe", "")
         else:
-            match = re.search(r"(750302-[\w\.-]+)", filename)
-            version_string = match.group(1) if match else filename
+            # 2. Fallback: Parse from the redirected URL path if it managed to route correctly
+            filename = final_url.split("/")[-1].split("?")[0]
+            if "-hyxd-overseas-" in filename and "-setup.exe" in filename:
+                version_string = filename.replace("-setup.exe", "")
+            else:
+                raise ValueError("Could not dynamically isolate the launcher package pattern from NetEase.")
 
         print(f"Extracted Version String: {version_string}")
 
-        # Quick guard check to make sure it didn't accidentally save the '650009' client version
-        if "650009" in version_string or "gwna" in version_string:
-            raise ValueError(
-                "Scraper returned the client package instead of the launcher update. Aborting file write."
-            )
+        # Safety Guard: Ensure it didn't grab 'gwna' or empty values
+        if version_string == "gwna" or not version_string:
+            raise ValueError("Extraction parsed an invalid shortlink slug.")
 
-        # File routing
+        # File path resolution
         txt_filename = "KnivesOutPC.txt"
         if not os.path.exists(txt_filename) and os.path.exists("../KnivesOutPC.txt"):
             txt_filename = "../KnivesOutPC.txt"
@@ -70,7 +57,7 @@ def update_knives_out_version():
         with open(txt_filename, "w", encoding="utf-8") as f:
             f.write(version_string)
 
-        print(f"Successfully updated {txt_filename} with the launcher version.")
+        print(f"Successfully updated {txt_filename} with dynamic version.")
 
     except Exception as e:
         print(f"An error occurred: {e}")
