@@ -2,58 +2,43 @@ name: Update KnivesOutPC Version
 
 on:
   schedule:
-    # Runs every 2 hours
+    # Trigger automatically every 2 hours
     - cron: '0 */2 * * *'
-  workflow_dispatch: # Allows you to trigger it manually from the Actions tab
+  workflow_dispatch: # Allows you to manually trigger the workflow from the Actions tab
 
 jobs:
   update-version:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed to push changes back to the repository
+      contents: write # Grants permissions to commit and push changes back to the repository
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Fetch Redirect URL and Extract String
-        id: get_version
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
         run: |
-          # 1. Follow redirection to get the final URL
-          FINAL_URL=$(curl -s -IL "https://adl.netease.com/d/g/knivesout/c/gwna" | grep -i "location:" | tail -n 1 | awk '{print $2}' | tr -d '\r')
-          
-          # Fallback check if the URL wasn't grabbed via headers properly
-          if [ -z "$FINAL_URL" ]; then
-            FINAL_URL=$(curl -sLo /dev/null -w "%{url_effective}" "https://adl.netease.com/d/g/knivesout/c/gwna")
-          fi
+          python -m pip install --upgrade pip
+          pip install requests
 
-          echo "Final URL resolved to: $FINAL_URL"
-
-          # 2. Extract the file name part before "-setup.exe"
-          # Example input: https://g83.gdl.netease.com/750302-hyxd-overseas-1.2.183.20260428153738.3195927-setup.exe?key1=...
-          FILENAME=$(basename "$FINAL_URL" | cut -d'?' -f1)
-          VERSION_STRING=$(echo "$FILENAME" | sed 's/-setup\.exe//')
-
-          echo "Extracted Version: $VERSION_STRING"
-          
-          # Save it to an environment variable for subsequent steps
-          echo "VERSION=$VERSION_STRING" >> $GITHUB_ENV
-
-      - name: Update KnivesOutPC.txt
-        run: |
-          # Overwrite the contents of KnivesOutPC.txt with the new version string
-          echo "${{ env.VERSION }}" > KnivesOutPC.txt
+      - name: Run Update Script
+        run: python Site/KnviesOutPC.py
 
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Check if there are actual changes before committing
+          # Check if KnivesOutPC.txt was modified by the Python script
           if [ -n "$(git status --porcelain)" ]; then
             git add KnivesOutPC.txt
-            git commit -m "chore: auto-update KnivesOutPC version to ${{ env.VERSION }}"
+            git commit -m "chore: auto-update KnivesOutPC version via script"
             git push
           else
-            echo "No changes detected. Version is already up to date."
+            echo "No changes detected. The text file is already up to date."
           fi
