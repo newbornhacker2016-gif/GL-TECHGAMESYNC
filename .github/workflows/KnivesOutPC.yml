@@ -1,4 +1,4 @@
-name: Update KnivesOutPC Version
+name: KnivesOutPC
 
 on:
   schedule:
