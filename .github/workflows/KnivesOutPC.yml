@@ -2,19 +2,20 @@ name: KnivesOutPC
 
 on:
   schedule:
-    # Trigger automatically every 2 hours
     - cron: '0 */2 * * *'
-  workflow_dispatch: # Allows you to manually trigger the workflow from the Actions tab
+  workflow_dispatch:
 
 jobs:
   update-version:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Grants permissions to commit and push changes back to the repository
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches full history so rebase works cleanly
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,11 +35,14 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          # Check if KnivesOutPC.txt was modified by the Python script
           if [ -n "$(git status --porcelain)" ]; then
             git add KnivesOutPC.txt
             git commit -m "chore: auto-update KnivesOutPC version via script"
-            git push
+            
+            # Pull down any remote changes and place our update on top
+            git pull --rebase origin main
+            
+            git push origin main
           else
-            echo "No changes detected. The text file is already up to date."
+            echo "No changes detected."
           fi
