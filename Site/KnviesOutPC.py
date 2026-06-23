@@ -4,7 +4,7 @@ import requests
 
 
 def update_knives_out_version():
-    # Use the master route. We won't hardcode the package ID anymore.
+    # Master distribution link
     url = "https://adl.netease.com/d/g/knivesout/c/gwna"
 
     headers = {
@@ -26,7 +26,7 @@ def update_knives_out_version():
         # Clean potential Javascript formatting backslashes out of the response body
         page_content = response.text.replace("\\/", "/")
 
-        # 1. Dynamic Extraction: Look for ANY package string pattern matching the launcher executable structure
+        # Dynamic Extraction: Look for ANY package string pattern matching the launcher executable structure
         # This matches: digits + "-hyxd-overseas-" + version numbers + "-setup.exe"
         # Example target: 750302-hyxd-overseas-1.2.183.20260428153738.3195927-setup.exe
         launcher_match = re.search(r'([\d]+-hyxd-overseas-[\d\.]+-setup\.exe)', page_content)
@@ -36,7 +36,7 @@ def update_knives_out_version():
             print(f"Found dynamic launcher pattern in payload: {filename}")
             version_string = filename.replace("-setup.exe", "")
         else:
-            # 2. Fallback: Parse from the redirected URL path if it managed to route correctly
+            # Fallback: Parse from the redirected URL path if it managed to route correctly
             filename = final_url.split("/")[-1].split("?")[0]
             if "-hyxd-overseas-" in filename and "-setup.exe" in filename:
                 version_string = filename.replace("-setup.exe", "")
