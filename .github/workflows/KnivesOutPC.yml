@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetches full history so rebase works cleanly
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -39,7 +39,7 @@ jobs:
             git add KnivesOutPC.txt
             git commit -m "chore: auto-update KnivesOutPC version via script"
             
-            # Pull down any remote changes and place our update on top
+            # Pull down remote changes to prevent fast-forward merge rejections
             git pull --rebase origin main
             
             git push origin main
