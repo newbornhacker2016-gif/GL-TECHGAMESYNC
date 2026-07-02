@@ -3,6 +3,7 @@ BullSF|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/r
 Crossfire PH|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/CrossfirePH.txt
 Knives Out|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/KnivesOutPC.txt
 League Of Legends|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/LeagueOfLegend.txt
+Meccha Chameleon|https://raw.githubusercontent.com/newbornhacker2016-gif/MecchaChameleon/refs/heads/main/Version.ini
 Roblox Player|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Roblox.txt
 Roblox Studio|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/RobloxStudio.txt
 SF Alpha|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/SFAlpha.txt
