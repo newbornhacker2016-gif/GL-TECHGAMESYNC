@@ -1,86 +1,41 @@
 import os
 import re
 import sys
-import time
-import requests
-import cloudscraper
 
 # Call of Duty: Warzone App ID on Steam
 APP_ID = "1962663"
-PAGE_URL = f"https://steamdb.info/app/{APP_ID}/"
 
-# Jina AI's free Reader proxy fetches the page server-side (from its own
-# infrastructure, not our CI runner's IP) and returns clean text. This gets
-# around SteamDB's Cloudflare rule that blocks whole cloud/CI IP ranges
-# (GitHub Actions included) outright, which no amount of header/UA tuning on
-# our end can fix. Docs: https://jina.ai/reader
-JINA_READER_URL = f"https://r.jina.ai/{PAGE_URL}"
+# This file is produced by the GitHub Actions workflow, which runs the real
+# `steamcmd` tool (the same one SteamDB itself uses) via:
+#   steamcmd.sh +login anonymous +app_info_update 1 +app_info_print 1962663 +quit
+# Warzone is a "DLC" type entry with no real installable depots/builds, so
+# there's no buildid to track. Instead we track Valve's own PICS
+# "_change_number" - the same value SteamDB displays as "Last Changenumber".
+# This is official Steam data, not scraped from SteamDB, so there's no
+# Cloudflare/bot-blocking risk at all.
+RAW_APPINFO_FILE = "appinfo_raw.txt"
 
-HISTORY_FILE = "Site/Steam/last_codwarzone_update.txt"
+HISTORY_FILE = "Site/Steam/last_codwarzone_changenumber.txt"
 OUTPUT_FILE = "Steam/Steam Call of Duty Warzone.txt"
 
-MAX_ATTEMPTS = 4
-RETRY_DELAY_SECONDS = 8
-
-LAST_RECORD_UPDATE_PATTERN = re.compile(
-    r"Last Record Update.{0,400}?(\d{1,2}\s+[A-Za-z]+\s+\d{4}\s*[\u2013-]\s*\d{2}:\d{2}:\d{2}\s*UTC)",
-    re.DOTALL,
-)
-
-def try_via_jina_reader():
-    try:
-        response = requests.get(JINA_READER_URL, timeout=30)
-        if response.status_code != 200:
-            print(f"Jina Reader proxy fetch failed: Status {response.status_code}")
-            return None
-
-        match = LAST_RECORD_UPDATE_PATTERN.search(response.text)
-        if match:
-            return match.group(1).strip()
-
-        print("Jina Reader fetch succeeded but 'Last Record Update' pattern not found.")
-        return None
-    except Exception as e:
-        print(f"Jina Reader proxy fetch error: {e}")
+def get_latest_change_number():
+    if not os.path.exists(RAW_APPINFO_FILE):
+        print(f"ERROR: {RAW_APPINFO_FILE} not found. Did the steamcmd step run first?")
         return None
 
-def try_via_direct_cloudscraper():
-    scraper = cloudscraper.create_scraper(
-        browser={"browser": "chrome", "platform": "windows", "mobile": False}
-    )
-    try:
-        response = scraper.get(PAGE_URL, timeout=25)
-        if response.status_code != 200:
-            print(f"Direct cloudscraper fetch failed: Status {response.status_code}")
-            return None
+    with open(RAW_APPINFO_FILE, "r", encoding="utf-8", errors="ignore") as f:
+        raw_text = f.read()
 
-        match = LAST_RECORD_UPDATE_PATTERN.search(response.text)
-        if match:
-            return match.group(1).strip()
+    # VDF (Valve's config format) looks like:
+    #   "1962663"
+    #   {
+    #       "_change_number"        "36926872"
+    #       ...
+    match = re.search(r'"_change_number"\s*"(\d+)"', raw_text)
+    if match:
+        return match.group(1).strip()
 
-        print("Direct fetch succeeded but 'Last Record Update' pattern not found.")
-        return None
-    except Exception as e:
-        print(f"Direct cloudscraper fetch error: {e}")
-        return None
-
-def get_latest_record_update():
-    last_error = None
-    for attempt in range(1, MAX_ATTEMPTS + 1):
-        result = try_via_jina_reader()
-        if result:
-            return result
-
-        result = try_via_direct_cloudscraper()
-        if result:
-            return result
-
-        last_error = "Both Jina Reader proxy and direct fetch failed."
-        print(f"Attempt {attempt}/{MAX_ATTEMPTS}: {last_error}")
-        if attempt < MAX_ATTEMPTS:
-            time.sleep(RETRY_DELAY_SECONDS)
-
-    print(f"All {MAX_ATTEMPTS} attempts failed. Last error: {last_error}")
+    print("Could not find '_change_number' in the steamcmd output.")
     return None
 
 def main():
@@ -89,33 +44,33 @@ def main():
     if os.path.dirname(OUTPUT_FILE):
         os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
 
-    latest_update = get_latest_record_update()
-    if not latest_update:
+    latest_change_number = get_latest_change_number()
+    if not latest_change_number:
         # No fake/placeholder fallback - fail loudly instead of
         # silently committing a bogus value.
-        print("ERROR: Could not determine the latest Warzone record update timestamp. Aborting without writing files.")
+        print("ERROR: Could not determine the latest Warzone changenumber. Aborting without writing files.")
         sys.exit(1)
 
-    print(f"Discovered Latest Warzone Record Update: {latest_update}")
+    print(f"Discovered Latest Warzone Changenumber: {latest_change_number}")
 
     # Read previous version to avoid unnecessary git commits
-    last_saved_update = ""
+    last_saved_change_number = ""
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
-            last_saved_update = f.read().strip()
+            last_saved_change_number = f.read().strip()
 
-    if latest_update != last_saved_update:
-        print(f"New update detected! Writing '{latest_update}' to repository files...")
+    if latest_change_number != last_saved_change_number:
+        print(f"New update detected! Writing changenumber '{latest_change_number}' to repository files...")
 
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-            f.write(latest_update)
+            f.write(latest_change_number)
 
         with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-            f.write(latest_update)
+            f.write(latest_change_number)
 
         print("Successfully updated target files.")
     else:
-        print("No update variance detected. Code execution clean.")
+        print("No changenumber variance detected. Code execution clean.")
 
 if __name__ == "__main__":
     main()
