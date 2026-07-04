@@ -59,11 +59,11 @@ jobs:
         git config --global user.email "actions@github.com"
         
         git add "Steam/Steam Call of Duty Warzone.txt" || true
-        git add **/last_codwarzone_changenumber.txt || true
+        git add **/last_codwarzone_update.txt || true
         
         if git diff --staged --quiet; then
-          echo "No changenumber variance discovered."
+          echo "No record update variance discovered."
         else
-          git commit -m "Update: Logged latest Call of Duty Warzone changenumber"
+          git commit -m "Update: Logged latest Call of Duty Warzone record update timestamp"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
         fi
