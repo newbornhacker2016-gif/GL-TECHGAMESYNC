@@ -1,4 +1,4 @@
-name: Steam Call of Duty Warzone
+name: Steam Farlight 84
 
 on:
   schedule:
@@ -12,7 +12,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  check-codwarzone:
+  check-farlight84:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
@@ -27,11 +27,26 @@ jobs:
       run: |
         pip install requests
 
+    - name: Install SteamCMD
+      run: |
+        mkdir -p steamcmd
+        cd steamcmd
+        curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+        chmod +x steamcmd.sh
+
+    - name: Query Farlight 84 App Info via SteamCMD
+      run: |
+        # Run it twice in a row into the same output - the first anonymous
+        # login sometimes returns stale/incomplete cached data.
+        ./steamcmd/steamcmd.sh +login anonymous +app_info_update 1 +app_info_print 1928420 +app_info_print 1928420 +quit > appinfo_raw.txt || true
+        echo "----- steamcmd output (tail) -----"
+        tail -n 40 appinfo_raw.txt
+
     - name: Run Scraper Script
       run: |
-        SCRIPT_PATH=$(find . -name "Steam_CODWarzone.py" -print -quit)
+        SCRIPT_PATH=$(find . -name "Steam_Farlight84.py" -print -quit)
         if [ -z "$SCRIPT_PATH" ]; then
-          echo "Error: Could not find Steam_CODWarzone.py anywhere in the repo layout!"
+          echo "Error: Could not find Steam_Farlight84.py anywhere in the repo layout!"
           exit 1
         fi
         python "$SCRIPT_PATH"
@@ -43,12 +58,12 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        git add "Steam/Steam Call of Duty Warzone.txt" || true
-        git add **/last_codwarzone_update.txt || true
+        git add "Steam/Steam Farlight84.txt" || true
+        git add **/last_farlight84_patch.txt || true
         
         if git diff --staged --quiet; then
-          echo "No record update variance discovered."
+          echo "No patch buildID variance discovered."
         else
-          git commit -m "Update: Logged latest Call of Duty Warzone record update timestamp"
+          git commit -m "Update: Logged latest Farlight 84 buildID token"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
         fi
