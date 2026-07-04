@@ -2,11 +2,19 @@ import os
 import re
 import sys
 import time
+import requests
 import cloudscraper
 
 # Call of Duty: Warzone App ID on Steam
 APP_ID = "1962663"
 PAGE_URL = f"https://steamdb.info/app/{APP_ID}/"
+
+# Jina AI's free Reader proxy fetches the page server-side (from its own
+# infrastructure, not our CI runner's IP) and returns clean text. This gets
+# around SteamDB's Cloudflare rule that blocks whole cloud/CI IP ranges
+# (GitHub Actions included) outright, which no amount of header/UA tuning on
+# our end can fix. Docs: https://jina.ai/reader
+JINA_READER_URL = f"https://r.jina.ai/{PAGE_URL}"
 
 HISTORY_FILE = "Site/Steam/last_codwarzone_update.txt"
 OUTPUT_FILE = "Steam/Steam Call of Duty Warzone.txt"
@@ -14,39 +22,61 @@ OUTPUT_FILE = "Steam/Steam Call of Duty Warzone.txt"
 MAX_ATTEMPTS = 4
 RETRY_DELAY_SECONDS = 8
 
-def get_latest_record_update():
-    # cloudscraper mimics a real browser's TLS/JS fingerprint well enough to
-    # get past Cloudflare's bot-check, which a plain `requests` GET cannot do
-    # (SteamDB blocks most datacenter/CI IP ranges, including GitHub Actions).
+LAST_RECORD_UPDATE_PATTERN = re.compile(
+    r"Last Record Update.{0,400}?(\d{1,2}\s+[A-Za-z]+\s+\d{4}\s*[\u2013-]\s*\d{2}:\d{2}:\d{2}\s*UTC)",
+    re.DOTALL,
+)
+
+def try_via_jina_reader():
+    try:
+        response = requests.get(JINA_READER_URL, timeout=30)
+        if response.status_code != 200:
+            print(f"Jina Reader proxy fetch failed: Status {response.status_code}")
+            return None
+
+        match = LAST_RECORD_UPDATE_PATTERN.search(response.text)
+        if match:
+            return match.group(1).strip()
+
+        print("Jina Reader fetch succeeded but 'Last Record Update' pattern not found.")
+        return None
+    except Exception as e:
+        print(f"Jina Reader proxy fetch error: {e}")
+        return None
+
+def try_via_direct_cloudscraper():
     scraper = cloudscraper.create_scraper(
         browser={"browser": "chrome", "platform": "windows", "mobile": False}
     )
+    try:
+        response = scraper.get(PAGE_URL, timeout=25)
+        if response.status_code != 200:
+            print(f"Direct cloudscraper fetch failed: Status {response.status_code}")
+            return None
 
+        match = LAST_RECORD_UPDATE_PATTERN.search(response.text)
+        if match:
+            return match.group(1).strip()
+
+        print("Direct fetch succeeded but 'Last Record Update' pattern not found.")
+        return None
+    except Exception as e:
+        print(f"Direct cloudscraper fetch error: {e}")
+        return None
+
+def get_latest_record_update():
     last_error = None
     for attempt in range(1, MAX_ATTEMPTS + 1):
-        try:
-            response = scraper.get(PAGE_URL, timeout=25)
-            if response.status_code == 200:
-                html = response.text
+        result = try_via_jina_reader()
+        if result:
+            return result
 
-                # The app page renders a table row like:
-                #   Last Record Update   4 June 2026 – 22:34:33 UTC (...)
-                match = re.search(
-                    r"Last Record Update.{0,400}?(\d{1,2}\s+[A-Za-z]+\s+\d{4}\s*[\u2013-]\s*\d{2}:\d{2}:\d{2}\s*UTC)",
-                    html,
-                    re.DOTALL,
-                )
-                if match:
-                    return match.group(1).strip()
+        result = try_via_direct_cloudscraper()
+        if result:
+            return result
 
-                last_error = "Could not locate 'Last Record Update' timestamp in the page HTML."
-            else:
-                last_error = f"Status {response.status_code}"
-
-        except Exception as e:
-            last_error = str(e)
-
-        print(f"Attempt {attempt}/{MAX_ATTEMPTS} failed to fetch SteamDB page: {last_error}")
+        last_error = "Both Jina Reader proxy and direct fetch failed."
+        print(f"Attempt {attempt}/{MAX_ATTEMPTS}: {last_error}")
         if attempt < MAX_ATTEMPTS:
             time.sleep(RETRY_DELAY_SECONDS)
 
