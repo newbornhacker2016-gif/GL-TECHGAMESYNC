@@ -1,9 +1,9 @@
-name: Steam Counter-Strike 2
+name: Steam Farlight 84
 
 on:
   schedule:
-    - cron: '0 */2 * * *' # Wakes up and sweeps for patch differences every 2 hours
-  workflow_dispatch: # Keeps manual force execution panel button active
+    - cron: '0 */2 * * *' # Automatically runs every 2 hours
+  workflow_dispatch: # Allows manual run initialization from the UI panel
 
 permissions:
   contents: write
@@ -12,7 +12,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  check-cs2:
+  check-farlight84:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
@@ -29,9 +29,9 @@ jobs:
 
     - name: Run Scraper Script
       run: |
-        SCRIPT_PATH=$(find . -name "Steam_CSGO2.py" -print -quit)
+        SCRIPT_PATH=$(find . -name "Steam_Farlight84.py" -print -quit)
         if [ -z "$SCRIPT_PATH" ]; then
-          echo "Error: Could not find Steam_CSGO2.py anywhere in the repo layout!"
+          echo "Error: Could not find Steam_Farlight84.py anywhere in the repo layout!"
           exit 1
         fi
         python "$SCRIPT_PATH"
@@ -43,12 +43,12 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        git add "Steam/Steam Counter-Strike 2.txt" || true
-        git add **/last_cs2_patch.txt || true
+        git add "Steam/Steam Farlight 84.txt" || true
+        git add **/last_farlight84_patch.txt || true
         
         if git diff --staged --quiet; then
-          echo "No patch date variance discovered."
+          echo "No patch buildID variance discovered."
         else
-          git commit -m "Update: Logged latest CS2 update date string"
+          git commit -m "Update: Logged latest Farlight 84 buildID token"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
         fi
