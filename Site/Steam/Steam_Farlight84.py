@@ -4,7 +4,7 @@ import requests
 # Official Valve API to get app info/manifest data dynamically without credentials
 API_URL = "https://api.steamgames.com/IProductInfoService/GetAppInfo/v2/?appid=1928420"
 HISTORY_FILE = "Site/Steam/last_farlight84_patch.txt"
-OUTPUT_FILE = "Steam/Steam Farlight 84.txt"
+OUTPUT_FILE = "Steam/Steam Farlight84.txt"
 
 def get_latest_farlight84_build_id():
     try:
