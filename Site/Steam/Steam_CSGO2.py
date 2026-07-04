@@ -1,43 +1,40 @@
 import os
-import requests
+import re
+import sys
 
-# Official Valve API to get app info/manifest data dynamically without credentials
-API_URL = "https://api.steamgames.com/IProductInfoService/GetAppInfo/v2/?appid=730"
+# Counter-Strike 2 App ID on Steam
+APP_ID = "730"
+
+# This file is produced by the GitHub Actions workflow, which runs the real
+# `steamcmd` tool (the same one SteamDB itself uses) via:
+#   steamcmd.sh +login anonymous +app_info_update 1 +app_info_print 730 +quit
+RAW_APPINFO_FILE = "appinfo_raw.txt"
+
 HISTORY_FILE = "Site/Steam/last_cs2_patch.txt"
 OUTPUT_FILE = "Steam/Steam Counter-Strike 2.txt"
 
 def get_latest_cs2_build_id():
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
-        response = requests.get(API_URL, headers=headers, timeout=15)
-        if response.status_code != 200:
-            print(f"Failed to fetch Valve AppInfo API: Status {response.status_code}")
-            return None
-            
-        data = response.json()
-        
-        # Safely traverse Valve's nested JSON configuration block
-        apps = data.get("response", {}).get("apps", {})
-        if not apps:
-            return None
-            
-        # Extract the metadata for App ID 730
-        app_data = apps[0] if isinstance(apps, list) else apps.get("730", {})
-        depots = app_data.get("appinfo", {}).get("depots", {})
-        
-        # Read the build ID associated explicitly with the live 'public' branch
-        public_branch = depots.get("branches", {}).get("public", {})
-        build_id = public_branch.get("buildid")
-        
-        if build_id:
-            return str(build_id).strip()
-            
+    if not os.path.exists(RAW_APPINFO_FILE):
+        print(f"ERROR: {RAW_APPINFO_FILE} not found. Did the steamcmd step run first?")
         return None
-    except Exception as e:
-        print(f"Error extracting Build ID from Valve metadata: {e}")
-        return None
+
+    with open(RAW_APPINFO_FILE, "r", encoding="utf-8", errors="ignore") as f:
+        raw_text = f.read()
+
+    # Look inside the "branches" -> "public" block for its "buildid" value.
+    # VDF (Valve's config format) looks like:
+    #   "branches"
+    #   {
+    #       "public"
+    #       {
+    #           "buildid"       "22561622"
+    #           ...
+    match = re.search(r'"public"\s*\{[^{}]*?"buildid"\s*"(\d+)"', raw_text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+
+    print("Could not find a 'public' branch buildid in the steamcmd output.")
+    return None
 
 def main():
     if os.path.dirname(HISTORY_FILE):
@@ -47,26 +44,28 @@ def main():
 
     latest_build_id = get_latest_cs2_build_id()
     if not latest_build_id:
-        print("Fallback activation: Could not read API parameters. Using safe layout sync values.")
-        latest_build_id = "14652936" # Safe historical baseline build fallback
+        # No fake/placeholder fallback - fail loudly instead of
+        # silently committing a bogus buildID.
+        print("ERROR: Could not determine the latest Counter-Strike 2 buildID. Aborting without writing files.")
+        sys.exit(1)
 
     print(f"Discovered Live Counter-Strike 2 Build ID: {latest_build_id}")
-    
+
     # Read previous version to avoid unnecessary git commits
     last_saved_build = ""
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r", encoding="utf-8") as f:
             last_saved_build = f.read().strip()
-            
+
     if latest_build_id != last_saved_build:
         print(f"New update detected! Writing buildID '{latest_build_id}' to repository files...")
-        
+
         with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
             f.write(latest_build_id)
-            
+
         with open(HISTORY_FILE, "w", encoding="utf-8") as f:
             f.write(latest_build_id)
-            
+
         print("Successfully updated target files.")
     else:
         print("No buildID variance detected. Code execution clean.")
