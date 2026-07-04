@@ -48,20 +48,19 @@ def is_time_allowed_pht():
     pht_zone = timezone(timedelta(hours=8))
     now_pht = datetime.now(pht_zone)
     
-    # weekday(): Monday=0, Tuesday=1, Wednesday=2, Thursday=3...
-    current_day = now_pht.weekday()
+    current_day = now_pht.weekday() # Monday=0, Tuesday=1, Wednesday=2...
     current_hour = now_pht.hour
     
     print(f"Current Time (PHT): {now_pht.strftime('%A %I:%M %p')}")
     
-    # If it is Monday (0) or Tuesday (1), don't update yet
+    # Block updates on Monday and Tuesday completely
     if current_day < 2:
         return False
-    # If it is Wednesday (2), check if it is past 11:00 AM (11)
+    # Block updates on Wednesday before 11:00 AM PHT
     if current_day == 2 and current_hour < 11:
         return False
         
-    # If it's Wednesday past 11 AM, Thursday, Friday, Saturday, or Sunday, allow updates
+    # Allow updates on Wednesday after 11 AM, Thursday, Friday, Saturday, Sunday
     return True
 
 def main():
@@ -89,6 +88,8 @@ def main():
         # Apply the Wednesday 11:00 AM PHT gate rule
         if not is_time_allowed_pht():
             print("Holding off update! It is not Wednesday at 11:00 AM PHT yet.")
+            # Critical Fix: We do NOT update HISTORY_FILE here so it tries again next run,
+            # but returning here is intended. The workflow will simply show "no changes to push".
             return
             
         print(f"Time gate passed. Writing version '{version_only}' to text files...")
