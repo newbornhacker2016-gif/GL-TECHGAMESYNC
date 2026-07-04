@@ -25,7 +25,22 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        pip install requests cloudscraper
+        pip install requests
+
+    - name: Install SteamCMD
+      run: |
+        mkdir -p steamcmd
+        cd steamcmd
+        curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+        chmod +x steamcmd.sh
+
+    - name: Query Call of Duty Warzone App Info via SteamCMD
+      run: |
+        # Run it twice in a row into the same output - the first anonymous
+        # login sometimes returns stale/incomplete cached data.
+        ./steamcmd/steamcmd.sh +login anonymous +app_info_update 1 +app_info_print 1962663 +app_info_print 1962663 +quit > appinfo_raw.txt || true
+        echo "----- steamcmd output (tail) -----"
+        tail -n 40 appinfo_raw.txt
 
     - name: Run Scraper Script
       run: |
@@ -44,11 +59,11 @@ jobs:
         git config --global user.email "actions@github.com"
         
         git add "Steam/Steam Call of Duty Warzone.txt" || true
-        git add **/last_codwarzone_update.txt || true
+        git add **/last_codwarzone_changenumber.txt || true
         
         if git diff --staged --quiet; then
-          echo "No record update variance discovered."
+          echo "No changenumber variance discovered."
         else
-          git commit -m "Update: Logged latest Call of Duty Warzone record update timestamp"
+          git commit -m "Update: Logged latest Call of Duty Warzone changenumber"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
         fi
