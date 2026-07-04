@@ -25,7 +25,7 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        pip install requests
+        pip install requests cloudscraper
 
     - name: Run Scraper Script
       run: |
