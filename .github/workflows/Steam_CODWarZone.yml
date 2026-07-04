@@ -1,1 +1,54 @@
+name: Steam Call of Duty Warzone
 
+on:
+  schedule:
+    - cron: '0 */2 * * *' # Automatically runs every 2 hours
+  workflow_dispatch: # Allows manual run initialization from the UI panel
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  check-codwarzone:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: |
+        pip install requests
+
+    - name: Run Scraper Script
+      run: |
+        SCRIPT_PATH=$(find . -name "Steam_CODWarzone.py" -print -quit)
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "Error: Could not find Steam_CODWarzone.py anywhere in the repo layout!"
+          exit 1
+        fi
+        python "$SCRIPT_PATH"
+
+    - name: Commit and Push Updates
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name "GitHub Action Bot"
+        git config --global user.email "actions@github.com"
+        
+        git add "Steam/Steam Call of Duty Warzone.txt" || true
+        git add **/last_codwarzone_update.txt || true
+        
+        if git diff --staged --quiet; then
+          echo "No record update variance discovered."
+        else
+          git commit -m "Update: Logged latest Call of Duty Warzone record update timestamp"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+        fi
