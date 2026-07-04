@@ -12,5 +12,5 @@ Steam Apex Legends|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TE
 Steam Call of Duty Warzone|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Call%20of%20Duty%20Warzone.txt
 Steam Counter-Strike 2|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Counter-Strike%202.txt
 Steam Dota 2|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Dota%202.txt
-Steam Farlight 84|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Farlight%2084.txt
+Steam Farlight 84|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Steam/Steam%20Farlight84.txt
 Valorant|https://raw.githubusercontent.com/newbornhacker2016-gif/GL-TECHGAMESYNC/refs/heads/main/Valorant.txt
