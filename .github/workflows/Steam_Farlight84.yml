@@ -43,7 +43,7 @@ jobs:
         git config --global user.name "GitHub Action Bot"
         git config --global user.email "actions@github.com"
         
-        git add "Steam/Steam Farlight 84.txt" || true
+        git add "Steam/Steam Farlight84.txt" || true
         git add **/last_farlight84_patch.txt || true
         
         if git diff --staged --quiet; then
