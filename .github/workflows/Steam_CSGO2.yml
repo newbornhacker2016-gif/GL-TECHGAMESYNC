@@ -1,1 +1,69 @@
+name: Steam Counter-Strike 2
 
+on:
+  schedule:
+    - cron: '0 */2 * * *' # Automatically runs every 2 hours
+  workflow_dispatch: # Allows manual run initialization from the UI panel
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  check-cs2:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: |
+        pip install requests
+
+    - name: Install SteamCMD
+      run: |
+        mkdir -p steamcmd
+        cd steamcmd
+        curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+        chmod +x steamcmd.sh
+
+    - name: Query Counter-Strike 2 App Info via SteamCMD
+      run: |
+        # Run it twice in a row into the same output - the first anonymous
+        # login sometimes returns stale/incomplete cached data.
+        ./steamcmd/steamcmd.sh +login anonymous +app_info_update 1 +app_info_print 730 +app_info_print 730 +quit > appinfo_raw.txt || true
+        echo "----- steamcmd output (tail) -----"
+        tail -n 40 appinfo_raw.txt
+
+    - name: Run Scraper Script
+      run: |
+        SCRIPT_PATH=$(find . -name "Steam_CSGO2.py" -print -quit)
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "Error: Could not find Steam_CSGO2.py anywhere in the repo layout!"
+          exit 1
+        fi
+        python "$SCRIPT_PATH"
+
+    - name: Commit and Push Updates
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --global user.name "GitHub Action Bot"
+        git config --global user.email "actions@github.com"
+        
+        git add "Steam/Steam Counter-Strike 2.txt" || true
+        git add **/last_cs2_patch.txt || true
+        
+        if git diff --staged --quiet; then
+          echo "No patch buildID variance discovered."
+        else
+          git commit -m "Update: Logged latest Counter-Strike 2 buildID token"
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+        fi
