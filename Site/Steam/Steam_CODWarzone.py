@@ -1,7 +1,8 @@
 import os
 import re
 import sys
-import requests
+import time
+import cloudscraper
 
 # Call of Duty: Warzone App ID on Steam
 APP_ID = "1962663"
@@ -10,36 +11,47 @@ PAGE_URL = f"https://steamdb.info/app/{APP_ID}/"
 HISTORY_FILE = "Site/Steam/last_codwarzone_update.txt"
 OUTPUT_FILE = "Steam/Steam Call of Duty Warzone.txt"
 
+MAX_ATTEMPTS = 4
+RETRY_DELAY_SECONDS = 8
+
 def get_latest_record_update():
-    try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                          "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            "Accept-Language": "en-US,en;q=0.9",
-        }
-        response = requests.get(PAGE_URL, headers=headers, timeout=20)
-        if response.status_code != 200:
-            print(f"Failed to fetch SteamDB page: Status {response.status_code}")
-            return None
+    # cloudscraper mimics a real browser's TLS/JS fingerprint well enough to
+    # get past Cloudflare's bot-check, which a plain `requests` GET cannot do
+    # (SteamDB blocks most datacenter/CI IP ranges, including GitHub Actions).
+    scraper = cloudscraper.create_scraper(
+        browser={"browser": "chrome", "platform": "windows", "mobile": False}
+    )
 
-        html = response.text
+    last_error = None
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            response = scraper.get(PAGE_URL, timeout=25)
+            if response.status_code == 200:
+                html = response.text
 
-        # The app page renders a table row like:
-        #   Last Record Update   4 June 2026 – 22:34:33 UTC (...)
-        # Grab the first date/time pattern that appears after that label.
-        match = re.search(
-            r"Last Record Update.{0,400}?(\d{1,2}\s+[A-Za-z]+\s+\d{4}\s*[\u2013-]\s*\d{2}:\d{2}:\d{2}\s*UTC)",
-            html,
-            re.DOTALL,
-        )
-        if match:
-            return match.group(1).strip()
+                # The app page renders a table row like:
+                #   Last Record Update   4 June 2026 – 22:34:33 UTC (...)
+                match = re.search(
+                    r"Last Record Update.{0,400}?(\d{1,2}\s+[A-Za-z]+\s+\d{4}\s*[\u2013-]\s*\d{2}:\d{2}:\d{2}\s*UTC)",
+                    html,
+                    re.DOTALL,
+                )
+                if match:
+                    return match.group(1).strip()
 
-        print("Could not locate 'Last Record Update' timestamp in the page HTML.")
-        return None
-    except Exception as e:
-        print(f"Error fetching/parsing SteamDB page: {e}")
-        return None
+                last_error = "Could not locate 'Last Record Update' timestamp in the page HTML."
+            else:
+                last_error = f"Status {response.status_code}"
+
+        except Exception as e:
+            last_error = str(e)
+
+        print(f"Attempt {attempt}/{MAX_ATTEMPTS} failed to fetch SteamDB page: {last_error}")
+        if attempt < MAX_ATTEMPTS:
+            time.sleep(RETRY_DELAY_SECONDS)
+
+    print(f"All {MAX_ATTEMPTS} attempts failed. Last error: {last_error}")
+    return None
 
 def main():
     if os.path.dirname(HISTORY_FILE):
