@@ -27,6 +27,21 @@ jobs:
       run: |
         pip install requests
 
+    - name: Install SteamCMD
+      run: |
+        mkdir -p steamcmd
+        cd steamcmd
+        curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+        chmod +x steamcmd.sh
+
+    - name: Query Farlight 84 App Info via SteamCMD
+      run: |
+        # Run it twice in a row into the same output - the first anonymous
+        # login sometimes returns stale/incomplete cached data.
+        ./steamcmd/steamcmd.sh +login anonymous +app_info_update 1 +app_info_print 1928420 +app_info_print 1928420 +quit > appinfo_raw.txt || true
+        echo "----- steamcmd output (tail) -----"
+        tail -n 40 appinfo_raw.txt
+
     - name: Run Scraper Script
       run: |
         SCRIPT_PATH=$(find . -name "Steam_Farlight84.py" -print -quit)
