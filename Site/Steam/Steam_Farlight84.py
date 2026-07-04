@@ -1,8 +1,14 @@
 import os
+import sys
 import requests
 
-# Official Valve API to get app info/manifest data dynamically without credentials
-API_URL = "https://api.steamgames.com/IProductInfoService/GetAppInfo/v2/?appid=1928420"
+# Farlight 84 App ID on Steam
+APP_ID = "1928420"
+
+# Real, public, unauthenticated API that mirrors steamcmd's app_info_print data.
+# Docs: https://www.steamcmd.net/ | Source: https://github.com/steamcmd/api
+API_URL = f"https://api.steamcmd.net/v1/info/{APP_ID}"
+
 HISTORY_FILE = "Site/Steam/last_farlight84_patch.txt"
 OUTPUT_FILE = "Steam/Steam Farlight84.txt"
 
@@ -13,30 +19,28 @@ def get_latest_farlight84_build_id():
         }
         response = requests.get(API_URL, headers=headers, timeout=15)
         if response.status_code != 200:
-            print(f"Failed to fetch Valve AppInfo API: Status {response.status_code}")
+            print(f"Failed to fetch SteamCMD API: Status {response.status_code}")
             return None
-            
+
         data = response.json()
-        
-        # Safely traverse Valve's nested JSON configuration block
-        apps = data.get("response", {}).get("apps", {})
-        if not apps:
+
+        if data.get("status") != "success":
+            print(f"SteamCMD API returned non-success status: {data.get('status')}")
             return None
-            
-        # Extract the metadata for App ID 1928420
-        app_data = apps[0] if isinstance(apps, list) else apps.get("1928420", {})
-        depots = app_data.get("appinfo", {}).get("depots", {})
-        
-        # Read the build ID associated explicitly with the live 'public' branch
-        public_branch = depots.get("branches", {}).get("public", {})
+
+        app_data = data.get("data", {}).get(APP_ID, {})
+        depots = app_data.get("depots", {})
+        branches = depots.get("branches", {})
+        public_branch = branches.get("public", {})
         build_id = public_branch.get("buildid")
-        
+
         if build_id:
             return str(build_id).strip()
-            
+
+        print("Could not locate 'depots.branches.public.buildid' in API response.")
         return None
     except Exception as e:
-        print(f"Error extracting Build ID from Valve metadata: {e}")
+        print(f"Error extracting Build ID from SteamCMD API: {e}")
         return None
 
 def main():
@@ -47,8 +51,10 @@ def main():
 
     latest_build_id = get_latest_farlight84_build_id()
     if not latest_build_id:
-        print("Fallback activation: Could not read API parameters. Using safe layout sync values.")
-        latest_build_id = "14000000" # Baseline layout fallback reference
+        # No fake/placeholder fallback anymore - fail loudly instead of
+        # silently committing a bogus buildID like "14000000".
+        print("ERROR: Could not determine the latest Farlight 84 buildID. Aborting without writing files.")
+        sys.exit(1)
 
     print(f"Discovered Live Farlight 84 Build ID: {latest_build_id}")
     
