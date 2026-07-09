@@ -11,62 +11,68 @@ def fetch_farlight_patch():
     }
 
     txt_filename = "Farlight84.txt"
-    # Resolve correct relative file paths for locally vs on remote runner jobs
     if not os.path.exists(txt_filename) and os.path.exists(os.path.join("..", txt_filename)):
         txt_path = os.path.join("..", txt_filename)
     else:
         txt_path = txt_filename
 
     try:
-        print(f"Connecting to Farlight 84 News board...")
+        print(f"Connecting to {url}...")
         response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # Farlight's DOM layout usually renders news lists in list items, anchors, or custom divs.
-        # We parse elements structurally looking for title matches containing date formats (YYYY.MM.DD) or generic elements.
-        elements = soup.find_all(['li', 'a', 'div', 'p'])
+        # Explicitly isolate and scan the <div class="new-container"> structural element
+        container = soup.find('div', class_='new-container')
+        
         latest_date = None
 
-        for el in elements:
-            text = el.get_text(" ", strip=True)
-            
-            # Target elements containing 'Update' or 'Patch Notes' phrases
-            if ("UPDATE" in text.upper() or "PATCH NOTES" in text.upper()):
-                # Match common pattern sequences found on their official site: YYYY.MM.DD
-                date_match = re.search(r'\b(20\d{2}[\./-]\d{2}[\./-]\d{2})\b', text)
-                if date_match:
-                    latest_date = date_match.group(1).replace('.', '-') # Clean format to YYYY-MM-DD
-                    break
+        if container:
+            print("Successfully located <div class='new-container'> element. Scanning children...")
+            # Look inside the container for links or blocks containing update info
+            elements = container.find_all(['a', 'li', 'div', 'p', 'span'])
+            for el in elements:
+                text = el.get_text(" ", strip=True)
+                
+                # Check if this item is an Update or Patch Note notice
+                if "UPDATE" in text.upper() or "PATCH NOTES" in text.upper():
+                    # Look for date patterns inside this element (e.g., 2025.07.28 or 2026.02.05)
+                    date_match = re.search(r'\b(20\d{2}[\./-]\d{2}[\./-]\d{2})\b', text)
+                    if date_match:
+                        latest_date = date_match.group(1).replace('.', '-')
+                        break
+        else:
+            print("Warning: <div class='new-container'> was not found directly in static HTML.")
+            print("Switching to a deep document scan strategy...")
+            # Fallback scan across all elements if structural layout shifted slightly
+            for el in soup.find_all(['li', 'a', 'div']):
+                text = el.get_text(" ", strip=True)
+                if "UPDATE" in text.upper() or "PATCH NOTES" in text.upper():
+                    date_match = re.search(r'\b(20\d{2}[\./-]\d{2}[\./-]\d{2})\b', text)
+                    if date_match:
+                        latest_date = date_match.group(1).replace('.', '-')
+                        break
 
-        # Fallback case: if raw HTML text matching fails due to Client-side JavaScript rendering,
-        # we pull directly from common API paths used by their framework if detectable.
         if not latest_date:
-            print("Web structure analysis fallback triggered...")
-            # We try a general regex scan across the whole response content body
-            all_dates = re.findall(r'\b(20\d{2}\.\d{2}\.\d{2})\b', response.text)
-            if all_dates:
-                latest_date = all_dates[0].replace('.', '-')
-
-        if not latest_date:
-            print("Could not isolate a recent patch update date from the target layout.")
+            print("Could not isolate a recent patch update date from the targeted elements.")
             sys.exit(0)
 
-        print(f"Scraped Date from Web: '{latest_date}'")
+        print(f"Scraped Patch Date from Web: '{latest_date}'")
 
-        # Track existing file changes
+        # Read the current contents of Farlight84.txt
         current_saved_date = ""
         if os.path.exists(txt_path):
             with open(txt_path, "r", encoding="utf-8") as f:
                 current_saved_date = f.read().strip()
         
+        # Overwrite file if the scraped date differs
         if latest_date != current_saved_date:
             with open(txt_path, "w", encoding="utf-8") as f:
                 f.write(latest_date)
             print(f"Updated {txt_filename}: '{current_saved_date}' -> '{latest_date}'")
         else:
-            print(f"No update required. Already matches live site: '{current_saved_date}'")
+            print(f"No update required. Already synchronized: '{current_saved_date}'")
 
     except Exception as e:
         print(f"Execution Error: {e}")
