@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 def fetch_farlight_patch():
+    # Target URL matching the update tab
     url = "https://farlight84.farlightgames.com/news/index.html?tab=2"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -21,58 +22,55 @@ def fetch_farlight_patch():
         response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Explicitly isolate and scan the <div class="new-container"> structural element
-        container = soup.find('div', class_='new-container')
-        
+        raw_html = response.text
         latest_date = None
 
-        if container:
-            print("Successfully located <div class='new-container'> element. Scanning children...")
-            # Look inside the container for links or blocks containing update info
-            elements = container.find_all(['a', 'li', 'div', 'p', 'span'])
-            for el in elements:
+        # Strategy 1: Search the raw HTML and embedded scripts for a date pattern following "Update" or "Patch" keywords
+        # This scans across any hidden JSON configurations or static arrays sent by the server.
+        matches = re.findall(r'(?:UPDATE|PATCH[^"\'\n]*)\s*.*?([2][0][2-3][0-9][\./-][0-1][0-9][\./-][0-3][0-9])', raw_html, re.IGNORECASE)
+        
+        if matches:
+            # Pick the most recent/first match and clean up delimiters to hyphenated formatting
+            latest_date = matches[0].replace('.', '-').replace('/', '-')
+            print(f"Located patch date via explicit data regex sweep: {latest_date}")
+        
+        # Strategy 2: If keyword regex fails, pull the absolute latest general date pattern inside the page source
+        if not latest_date:
+            all_dates = re.findall(r'\b(20\d{2}[\./-]\d{2}[\./-]\d{2})\b', raw_html)
+            if all_dates:
+                latest_date = all_dates[0].replace('.', '-').replace('/', '-')
+                print(f"Located date via global fallback timestamp search: {latest_date}")
+
+        # Strategy 3: Check standard BeautifulSoup text extraction across all tags
+        if not latest_date:
+            soup = BeautifulSoup(raw_html, 'html.parser')
+            for el in soup.find_all(True):
                 text = el.get_text(" ", strip=True)
-                
-                # Check if this item is an Update or Patch Note notice
-                if "UPDATE" in text.upper() or "PATCH NOTES" in text.upper():
-                    # Look for date patterns inside this element (e.g., 2025.07.28 or 2026.02.05)
+                if "UPDATE" in text.upper() or "PATCH" in text.upper():
                     date_match = re.search(r'\b(20\d{2}[\./-]\d{2}[\./-]\d{2})\b', text)
                     if date_match:
-                        latest_date = date_match.group(1).replace('.', '-')
-                        break
-        else:
-            print("Warning: <div class='new-container'> was not found directly in static HTML.")
-            print("Switching to a deep document scan strategy...")
-            # Fallback scan across all elements if structural layout shifted slightly
-            for el in soup.find_all(['li', 'a', 'div']):
-                text = el.get_text(" ", strip=True)
-                if "UPDATE" in text.upper() or "PATCH NOTES" in text.upper():
-                    date_match = re.search(r'\b(20\d{2}[\./-]\d{2}[\./-]\d{2})\b', text)
-                    if date_match:
-                        latest_date = date_match.group(1).replace('.', '-')
+                        latest_date = date_match.group(1).replace('.', '-').replace('/', '-')
+                        print(f"Located patch date via DOM string fallback: {latest_date}")
                         break
 
         if not latest_date:
-            print("Could not isolate a recent patch update date from the targeted elements.")
-            sys.exit(0)
+            print("Error: Could not isolate an official update timestamp from page source or embedded data configurations.")
+            sys.exit(1)
 
-        print(f"Scraped Patch Date from Web: '{latest_date}'")
+        print(f"Final Scraped Patch Date: '{latest_date}'")
 
-        # Read the current contents of Farlight84.txt
+        # Compare with the currently saved patch date
         current_saved_date = ""
         if os.path.exists(txt_path):
             with open(txt_path, "r", encoding="utf-8") as f:
                 current_saved_date = f.read().strip()
         
-        # Overwrite file if the scraped date differs
         if latest_date != current_saved_date:
             with open(txt_path, "w", encoding="utf-8") as f:
                 f.write(latest_date)
             print(f"Updated {txt_filename}: '{current_saved_date}' -> '{latest_date}'")
         else:
-            print(f"No update required. Already synchronized: '{current_saved_date}'")
+            print(f"No update required. Local file is synchronized with the live site: '{current_saved_date}'")
 
     except Exception as e:
         print(f"Execution Error: {e}")
