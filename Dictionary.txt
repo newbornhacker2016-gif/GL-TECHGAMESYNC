@@ -21,3 +21,7 @@
 "Special Force","Special Force"
 "SFRush","SFRush"
 "Dragonnest","Dragon Nest"
+"Dragonnest","DragonNest"
+"Farlight84","Farlight84"
+"Farlight 84","Farlight 84"
+"Farlight84","Farlight 84"
