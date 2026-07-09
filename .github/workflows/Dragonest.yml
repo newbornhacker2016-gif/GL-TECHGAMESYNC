@@ -1,1 +1,45 @@
+name: Dragon Nest Update Patch Tracker
 
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Runs automatically every 6 hours
+  workflow_dispatch: # Allows manual trigger anytime from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      - name: Run Scraper Script from Site Folder
+        run: python Site/Dragonest.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          git add Dragonnest.txt
+          
+          # Safely verify structural updates before firing pushes
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: update latest patch date to $(cat Dragonnest.txt)"
+            git push
+          else
+            echo "No changes found. Dragonnest.txt matches live notice board configuration."
+          fi
