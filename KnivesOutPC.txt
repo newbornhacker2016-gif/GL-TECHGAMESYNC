@@ -1,1 +1,1 @@
-Version: 54 2024-08-13/r750400 New Season
+Version: 54 2024-08-13/r750400
