@@ -25,3 +25,5 @@
 "Farlight84","Farlight84"
 "Farlight 84","Farlight 84"
 "Farlight84","Farlight 84"
+"Myth Games Launcher","Myth Games Launcher"
+"Myth Game Launcher","Myth Games Launcher"
